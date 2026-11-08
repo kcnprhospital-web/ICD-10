@@ -1,0 +1,17 @@
+{
+  "name": "KCPH ICD-10 Finder – ស្វែងរកកូដ ICD-10",
+  "short_name": "ICD-10 KCPH",
+  "description": "Bilingual Khmer–English ICD-10 code finder with KCPH risk colours. Developed by Dr. Yeap Kong, Technical Office, Kampong Chhnang Provincial Hospital.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#2B3990",
+  "lang": "km",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
