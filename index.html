@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KCPH ICD-10 Finder</title>
+<meta name="description" content="Bilingual Khmer–English ICD-10 code finder with KCPH risk colours. Developed by Dr. Yeap Kong, Technical Office, Kampong Chhnang Provincial Hospital.">
+<meta name="author" content="Dr. Yeap Kong – Technical Office, Kampong Chhnang Provincial Hospital (KCPH)">
+<meta name="theme-color" content="#2B3990">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ICD-10 KCPH">
+<script src="lib/xlsx.full.min.js" defer></script>
+<script src="lib/qrcode.min.js" defer></script>
+<style>
+/* Kantumruy Pro (SIL OFL 1.1) — bundled so Khmer displays correctly offline */
+@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/kantumruy-pro-khmer-400-normal.woff2) format('woff2');unicode-range:U+1780-17FF,U+19E0-19FF,U+200C-200D,U+25CC}
+@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/kantumruy-pro-khmer-600-normal.woff2) format('woff2');unicode-range:U+1780-17FF,U+19E0-19FF,U+200C-200D,U+25CC}
+@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/kantumruy-pro-khmer-700-normal.woff2) format('woff2');unicode-range:U+1780-17FF,U+19E0-19FF,U+200C-200D,U+25CC}
+@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/kantumruy-pro-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/kantumruy-pro-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Kantumruy Pro';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/kantumruy-pro-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+:root{
+  --blue:#2B3990; --blue-d:#1E2A6E; --blue-l:#E9ECF8; --red:#E31E24;
+  --ink:#1B2033; --ink2:#4A5168; --ink3:#6B7186; --line:#DDE1EC; --bg:#F5F6FA; --card:#FFFFFF;
+  --hi:#E02B2B; --hi-t:#FDE7E7; --hi-x:#9B1C1C;
+  --mo:#FFC000; --mo-t:#FFF6DB; --mo-x:#6B4E00;
+  --lo:#00A651; --lo-t:#E8F6EE; --lo-x:#146B3A;
+  --ca:#8A939B; --ca-t:#F1F3F5; --ca-x:#4B5359;
+  --radius:14px; --shadow:0 1px 2px rgba(20,30,70,.06),0 4px 14px rgba(20,30,70,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Kantumruy Pro','Noto Sans Khmer','Khmer OS',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.55;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--blue)}
+.mono{font-family:ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;letter-spacing:.2px}
+.hidden{display:none!important}
+/* app bar */
+.bar{position:sticky;top:0;z-index:30;background:var(--blue);color:#fff;padding:calc(env(safe-area-inset-top) + 8px) 14px 8px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.bar img{width:42px;height:42px;border-radius:10px;background:#fff;flex:none;padding:2px}
+.bar .ttl{flex:1;min-width:0;line-height:1.25}
+.bar .ttl b{display:block;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .ttl span{display:block;font-size:12.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lang{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:6px 12px;font-size:14px;font-weight:600;white-space:nowrap}
+.net{width:10px;height:10px;border-radius:50%;background:#7CE0A3;flex:none}
+.net.off{background:#FFC000}
+/* layout */
+main{max-width:980px;margin:0 auto;padding:14px 14px calc(96px + env(safe-area-inset-bottom))}
+.view{display:none}.view.on{display:block}
+h2.vt{font-size:20px;margin:6px 2px 12px;color:var(--blue-d)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.pad{padding:14px 16px}
+.muted{color:var(--ink3)}
+.small{font-size:14px}
+/* nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid var(--line);display:flex;padding:4px 4px calc(4px + env(safe-area-inset-bottom))}
+nav.tabs button{flex:1;background:none;border:0;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--ink3);font-size:12.5px;font-weight:600;border-radius:10px;position:relative}
+nav.tabs button svg{width:24px;height:24px}
+nav.tabs button.on{color:var(--blue);background:var(--blue-l)}
+nav.tabs .cnt{position:absolute;top:2px;right:calc(50% - 22px);background:var(--red);color:#fff;font-size:11px;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+@media (min-width:900px){
+  nav.tabs{position:sticky;top:56px;bottom:auto;max-width:980px;margin:0 auto;border:0;background:transparent;padding:10px 14px 0;gap:6px}
+  nav.tabs button{flex-direction:row;justify-content:center;gap:8px;font-size:15px;padding:10px;background:#fff;border:1px solid var(--line)}
+  nav.tabs .cnt{position:static}
+  main{padding-bottom:40px}
+}
+/* search */
+.sbox{position:relative}
+.sbox input{width:100%;border:2px solid var(--blue);border-radius:14px;padding:14px 92px 14px 48px;font-size:18px;background:#fff;outline:none;box-shadow:var(--shadow)}
+.sbox input:focus{box-shadow:0 0 0 4px rgba(43,57,144,.15)}
+.sbox .ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:22px;height:22px;color:var(--blue)}
+.sbox input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.sbox .mic{position:absolute;right:48px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--blue);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.sbox .mic svg{width:22px;height:22px}.sbox .mic.on{background:var(--red);color:#fff}
+.sbox .clr{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:var(--blue-l);color:var(--blue);width:34px;height:34px;border-radius:50%;font-size:20px;line-height:1}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:14.5px;color:var(--ink2)}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.chip.r3.on{background:var(--hi);border-color:var(--hi)}
+.chip.r2.on{background:var(--mo);border-color:var(--mo);color:#3D2E00}
+.chip.r1.on{background:var(--lo);border-color:var(--lo)}
+.meta{font-size:14px;color:var(--ink3);margin:4px 2px 8px}
+/* rows */
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-left:6px solid var(--line);border-radius:12px;padding:10px 12px;text-align:left;width:100%}
+.row{cursor:pointer}
+.row:active{background:#FAFBFF}
+.row:focus-visible{outline:3px solid rgba(43,57,144,.35);outline-offset:1px}
+.row .ra-w{display:flex;flex-direction:column;gap:6px;flex:none;align-self:center}
+.ra{width:40px;height:38px;border:1px solid var(--line);background:#fff;border-radius:10px;color:var(--blue);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0}
+.ra:active{background:var(--blue-l)}
+.ra.done{background:var(--lo-t);color:var(--lo-x);border-color:#BFE5CF}
+.tag.w{background:#FFF6DB;color:#5E4500}.tag.x{background:var(--hi-t);color:var(--hi-x)}
+.dym{background:#FFF8E1;border:1px solid #F3DE9A;border-radius:12px;padding:10px 12px;margin:4px 0 10px;font-size:15px}
+.dym button{border:0;background:none;color:var(--blue);font-weight:700;text-decoration:underline;padding:0 2px;font-size:15px}
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tool{display:flex;gap:10px;align-items:center;text-align:left;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px;width:100%;color:var(--ink);text-decoration:none}
+.tool .ti{width:40px;height:40px;border-radius:10px;background:var(--blue-l);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.tool b{display:block;font-size:15.5px;line-height:1.35}.tool span{display:block;font-size:13px;color:var(--ink3);line-height:1.35}
+.cr{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.cr .e{font-size:13px;color:var(--ink3)}
+.row.r3{border-left-color:var(--hi)}.row.r2{border-left-color:var(--mo)}.row.r1{border-left-color:var(--lo)}.row.r0{border-left-color:var(--ca)}
+.row .cd{flex:none;min-width:84px;font-weight:700;color:var(--blue-d);font-size:16.5px;padding-top:1px}
+.row .tx{flex:1;min-width:0}
+.row .t1{font-size:16px;line-height:1.45}
+.row .t2{font-size:14.5px;color:var(--ink2);line-height:1.5;margin-top:2px}
+.row .t3{font-size:13.5px;color:var(--ink3);margin-top:2px}
+.row .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.row .go{flex:none;color:var(--ink3);align-self:center;font-size:20px}
+mark{background:#FFF1A8;color:inherit;border-radius:3px;padding:0 1px}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;border-radius:999px;padding:2px 9px;line-height:1.6;white-space:nowrap}
+.tag.k{background:#EEF0FB;color:var(--blue)}
+.tag.h{background:#F1F2F6;color:var(--ink2)}
+.tag.l{background:#FFF0E6;color:#8A3C00}
+.tag.ok{background:var(--lo-t);color:var(--lo-x)}
+.rb{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;border-radius:999px;padding:2px 9px;line-height:1.6;white-space:nowrap}
+.rb::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}
+.rb.r3{background:var(--hi-t);color:var(--hi-x)}.rb.r3::before{background:var(--hi)}
+.rb.r2{background:var(--mo-t);color:var(--mo-x)}.rb.r2::before{background:var(--mo)}
+.rb.r1{background:var(--lo-t);color:var(--lo-x)}.rb.r1::before{background:var(--lo)}
+.rb.r0{background:var(--ca-t);color:var(--ca-x)}.rb.r0::before{background:var(--ca)}
+.more{width:100%;margin-top:10px;border:1px dashed var(--blue);background:#fff;color:var(--blue);border-radius:12px;padding:12px;font-weight:600}
+.empty{text-align:center;color:var(--ink3);padding:30px 10px}
+/* home cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.svc{display:flex;gap:12px;align-items:center;text-align:left;padding:14px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);width:100%}
+.svc .ico{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;flex:none}
+.svc b{display:block;font-size:16px;line-height:1.35}
+.svc span{display:block;font-size:13.5px;color:var(--ink3);line-height:1.4}
+.sec{font-size:15px;font-weight:700;color:var(--blue-d);margin:18px 2px 8px;display:flex;align-items:center;gap:8px}
+.sec::after{content:"";flex:1;height:1px;background:var(--line)}
+.legend{display:flex;flex-wrap:wrap;gap:8px}
+/* crumbs */
+.crumbs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:14px;margin:0 2px 10px}
+.crumbs button{border:0;background:var(--blue-l);color:var(--blue);border-radius:8px;padding:3px 9px;font-size:14px}
+.crumbs i{color:var(--ink3);font-style:normal}
+.node{margin-bottom:10px}
+/* segmented */
+.seg{display:flex;background:#E6E9F2;border-radius:12px;padding:3px;margin:4px 0 10px}
+.seg button{flex:1;border:0;background:none;padding:8px;border-radius:10px;font-weight:600;font-size:15px;color:var(--ink2)}
+.seg button.on{background:#fff;color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.grp{font-size:14.5px;font-weight:700;color:var(--ink2);margin:14px 2px 6px}
+/* sheet */
+.ov{position:fixed;inset:0;background:rgba(15,20,45,.45);z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:#fff;width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:6px 18px calc(22px + env(safe-area-inset-bottom));animation:up .18s ease-out}
+@media (min-width:760px){.ov{align-items:center}.sheet{border-radius:20px;max-height:88vh}}
+@keyframes up{from{transform:translateY(30px);opacity:.5}to{transform:none;opacity:1}}
+.grab{width:44px;height:5px;border-radius:3px;background:#D5D9E5;margin:6px auto 10px}
+.sh-top{display:flex;align-items:center;gap:10px}
+.sh-top .x{margin-left:auto;border:0;background:#EEF0F6;width:38px;height:38px;border-radius:50%;font-size:20px}
+.bigcode{font-size:34px;font-weight:700;color:var(--blue-d);line-height:1.1}
+.ttlen{font-size:19px;font-weight:600;margin:10px 0 4px;line-height:1.45}
+.ttlkh{font-size:18px;color:var(--ink);margin:2px 0;line-height:1.7}
+.ttlfr{font-size:15px;color:var(--ink3);font-style:italic;margin:2px 0}
+.stat{display:flex;gap:10px;align-items:flex-start;border-radius:12px;padding:10px 12px;margin:12px 0;font-size:15px}
+.stat.ok{background:var(--lo-t);color:var(--lo-x)}
+.stat.hd{background:#FFF6DB;color:#5E4500}
+.stat.lc{background:#FFF0E6;color:#7A3500}
+.rk{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}
+.rk .h{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-weight:600;font-size:15px}
+.rk p{margin:6px 0 0;font-size:14.5px;color:var(--ink2)}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 6px}
+.btn{border:1px solid var(--blue);background:#fff;color:var(--blue);border-radius:12px;padding:11px 12px;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;gap:6px;text-align:center}
+.btn.p{background:var(--blue);color:#fff}
+.btn.r{border-color:var(--red);color:var(--red)}
+.btn.g{border-color:var(--line);color:var(--ink2)}
+.btn:disabled{opacity:.5}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btns .btn{flex:1 1 140px}
+/* list tab */
+.pl{display:flex;flex-direction:column;gap:8px}
+.pi{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.pi .n{width:28px;height:28px;border-radius:50%;background:var(--blue-l);color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex:none}
+.pi .n.m{background:var(--blue);color:#fff}
+.pi .b{flex:1;min-width:0}
+.pi .b .c{font-weight:700;color:var(--blue-d)}
+.pi .b .d{font-size:14.5px;color:var(--ink2);line-height:1.45}
+.ib{border:1px solid var(--line);background:#fff;border-radius:10px;width:36px;height:36px;font-size:16px;color:var(--ink2);flex:none}
+label.f{display:block;font-size:14.5px;font-weight:600;color:var(--ink2);margin:12px 0 4px}
+.in{width:100%;border:1px solid #C9CFDF;border-radius:10px;padding:11px 12px;font-size:16px;background:#fff}
+textarea.in{min-height:96px;resize:vertical}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1B2033;color:#fff;padding:10px 18px;border-radius:999px;font-size:15px;z-index:90;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:90vw;text-align:center}
+.steps{margin:0;padding-left:22px}.steps li{margin:6px 0}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.st{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.st b{display:block;font-size:26px;line-height:1.2;color:var(--blue-d)}.st span{font-size:13.5px;color:var(--ink3);line-height:1.35;display:block}
+.tbw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:#fff}
+table.tb{width:100%;border-collapse:collapse;font-size:14.5px}
+table.tb th,table.tb td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+table.tb th{background:var(--blue-l);color:var(--blue-d);font-weight:600;white-space:nowrap}
+table.tb td.n,table.tb th.n{text-align:right;font-variant-numeric:tabular-nums}
+.chart{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
+.key{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink2);margin-right:14px}.key i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.credit{text-align:center;padding:18px 10px 6px;color:var(--ink3);font-size:13.5px;line-height:1.6}
+.credit b{color:var(--blue-d)}
+.hero{display:flex;gap:14px;align-items:center}
+.hero img{width:84px;height:84px;border-radius:14px;flex:none;border:1px solid var(--line)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:15px}
+.kv dt{color:var(--ink3)}.kv dd{margin:0}
+#qr{display:flex;justify-content:center;padding:10px}
+#qr img,#qr canvas{width:180px!important;height:180px!important}
+/* loader */
+#load{position:fixed;inset:0;background:#fff;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center}
+#load img{width:150px;height:150px}
+#load .pb{width:min(320px,80vw);height:8px;background:#E6E9F2;border-radius:4px;overflow:hidden}
+#load .pb i{display:block;height:100%;width:0;background:var(--blue);transition:width .2s}
+/* print */
+#print{display:none}
+@page{size:A4;margin:12mm 10mm 14mm;@bottom-right{content:counter(page) " / " counter(pages);font-size:9pt;color:#555}}
+@media print{
+  body{background:#fff;font-size:12pt}
+  .bar,nav.tabs,main,.ov,.toast,#load{display:none!important}
+  #print{display:block;padding:0 6mm}
+  .ph{text-align:center;margin-bottom:10px}
+  .ph img{width:90px;height:90px}
+  .ph .h1{font-weight:700;font-size:13pt;margin-top:4px}
+  .ph .h2{font-size:11pt}
+  table.pt{width:100%;border-collapse:collapse;font-size:10.5pt;margin-top:12px}
+  table.pt caption{caption-side:top;text-align:left;font-weight:700;font-size:11.5pt;padding:0 0 4px}
+  table.pt thead{display:table-header-group}
+  table.pt tr{break-inside:avoid;page-break-inside:avoid}
+  table.pt th,table.pt td{border:1px solid #999;padding:5px 6px;text-align:left;vertical-align:top}
+  table.pt th{background:#E9ECF8;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  table.pt td.n,table.pt th.n{text-align:right;white-space:nowrap}
+  table.pt .nw{white-space:nowrap}
+  table.pt.sm{font-size:9.5pt}
+  .keep{break-inside:avoid;page-break-inside:avoid;margin-top:12px}
+  #print h4{margin:0 0 4px;font-size:11.5pt}
+  #print svg{width:100%;height:auto}
+  .pf{margin-top:14px;font-size:9pt;color:#555;text-align:center}
+}
+</style>
+</head>
+<body>
+<div id="load">
+  <img id="ldLogo" alt="KCPH logo">
+  <div style="font-weight:700;font-size:20px;color:#1E2A6E">KCPH ICD-10 Finder</div>
+  <div class="muted" id="ldMsg">កំពុងផ្ទុកកូដ ICD-10 … / Loading ICD-10 codes …</div>
+  <div class="pb"><i id="ldBar"></i></div>
+  <div class="credit" style="padding-top:4px">Developed by <b>Dr. Yeap Kong</b><br>Technical Office · Kampong Chhnang Provincial Hospital</div>
+</div>
+
+<header class="bar">
+  <img id="barLogo" alt="KCPH">
+  <div class="ttl"><b data-t="appName"></b><span data-t="appSub"></span></div>
+  <span class="net" id="net" title="online"></span>
+  <button class="lang" id="langBtn" aria-label="Change language">EN</button>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-v="search" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span data-t="tSearch"></span></button>
+  <button data-v="services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span data-t="tServices"></span></button>
+  <button data-v="browse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h10M4 19h6"/></svg><span data-t="tBrowse"></span></button>
+  <button data-v="mylist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1Z"/><path d="M16 5h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/><path d="M8 12h8M8 16h5"/></svg><span data-t="tList"></span><em class="cnt hidden" id="listCnt"></em></button>
+  <button data-v="help"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01"/></svg><span data-t="tHelp"></span></button>
+</nav>
+
+<main>
+  <!-- SEARCH -->
+  <section class="view on" id="v-search">
+    <div class="sbox">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+      <button class="mic hidden" id="qMic" aria-label="Voice search" title="Voice search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+      <button class="clr hidden" id="qClr" aria-label="Clear">×</button>
+    </div>
+    <div class="chips" id="fChips">
+      <button class="chip" data-f="leaf" data-t="fLeaf"></button>
+      <button class="chip" data-f="kcph" data-t="fKcph"></button>
+      <button class="chip" data-f="key" data-t="fKey"></button>
+      <button class="chip r3" data-f="r3" data-t="rHigh"></button>
+    </div>
+    <div id="sOut"></div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="view" id="v-services"><div id="svcOut"></div></section>
+
+  <!-- BROWSE -->
+  <section class="view" id="v-browse"><div id="brOut"></div></section>
+
+  <!-- MY LIST -->
+  <section class="view" id="v-mylist"><div id="mlOut"></div></section>
+
+  <!-- HELP -->
+  <section class="view" id="v-help"><div id="hpOut"></div></section>
+
+  <!-- MONTHLY USAGE REPORT (admin, opened from Help) -->
+  <section class="view" id="v-report"><div id="rpOut"></div></section>
+
+  <!-- CODE CHECKER -->
+  <section class="view" id="v-check"><div id="ckOut"></div></section>
+</main>
+
+<div id="print"></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   KCPH ICD-10 Finder
+   Developed by Dr. Yeap Kong — Chief, Technical Office,
+   Kampong Chhnang Provincial Hospital (KCPH), Cambodia.
+   Codes: KCPH master list ICD10-Diagnosis_Updated_9.
+   Risk colours: KCPH service workbooks (ANC/Maternity/PNC/Newborn,
+   NCD, Surgery, Mental Health, Internal Medicine), Nov 2026.
+   ===================================================================== */
+const APP_VERSION = '1.3.1 (2026-11)';
+const DATA_URL = 'icd10-data.json?v=2026-11a';
+const FR_URL = 'icd10-fr.json?v=2026-11a';
+const DATA_BYTES = 9429446;                // for the progress bar
+// Paste the Apps Script /exec URL here after deploying Code.gs (leave '' to run without a backend).
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxMJ3Mcqbp8nZMzrfRacRbJhEuQm2cJUk19Q_sjMStgUPqEIVvd7opxL45IqNPZGg/exec';
+const LOGO = 'data:image/png;base64,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';
+const AUTHOR_EN = 'Dr. Yeap Kong';
+const AUTHOR_ROLE_EN = 'Chief, Technical Office, Kampong Chhnang Provincial Hospital';
+const AUTHOR_ROLE_KH = 'ប្រធានការិយាល័យបច្ចេកទេស មន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង';
+const HOSP_EN = 'Kampong Chhnang Provincial Hospital';
+const HOSP_KH = 'មន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង';
+
+/* ---------- storage (safe) ---------- */
+const NS = 'kcph_icd10_';
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(NS + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(NS + k, JSON.stringify(v)); } catch (e) {} }
+};
+const S = Object.assign({ lang: 'kh', fr: false, facility: '', province: '', leafOnly: false, dept: '' }, store.get('settings', {}));
+function saveS() { store.set('settings', S); }
+
+/* ---------- text ---------- */
+const T = {
+  appName: { kh: 'ស្វែងរកកូដ ICD-10', en: 'ICD-10 Finder' },
+  appSub: { kh: 'មន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង · KCPH', en: 'Kampong Chhnang Provincial Hospital · KCPH' },
+  tSearch: { kh: 'ស្វែងរក', en: 'Search' }, tServices: { kh: 'សេវា', en: 'Services' }, tBrowse: { kh: 'ជំពូក', en: 'Chapters' },
+  tList: { kh: 'បញ្ជីខ្ញុំ', en: 'My list' }, tHelp: { kh: 'ជំនួយ', en: 'Help' },
+  qPh: { kh: 'វាយកូដ ឬឈ្មោះជំងឺ (ខ្មែរ/អង់គ្លេស) ឧ. J18, រលាកសួត, dengue', en: 'Type a code or diagnosis (English/Khmer), e.g. J18, pneumonia, ផ្ទៃពោះ' },
+  fLeaf: { kh: 'តែកូដប្រើបាន', en: 'Codable only' }, fKcph: { kh: 'ក្នុងបញ្ជីសេវា KCPH', en: 'In KCPH service lists' },
+  fKey: { kh: '★ មានឈ្មោះខ្មែរ', en: '★ Khmer-labelled' },
+  rHigh: { kh: 'ក្រហមប៉ុណ្ណោះ', en: 'RED only' },
+  results: { kh: 'លទ្ធផល', en: 'results' }, showMore: { kh: 'បង្ហាញបន្ថែម', en: 'Show more' },
+  noRes: { kh: 'រកមិនឃើញ។ សាកពាក្យខ្លីជាង ឬកូដ ៣ តួអក្សរដំបូង (ឧ. J18)។', en: 'Nothing found. Try a shorter word or the first 3 characters of the code (e.g. J18).' },
+  tryEx: { kh: 'ឧទាហរណ៍', en: 'Try' },
+  recent: { kh: 'បានមើលថ្មីៗ', en: 'Recently viewed' }, favs: { kh: 'កូដដែលខ្ញុំចូលចិត្ត', en: 'My favourite codes' },
+  svcTitle: { kh: 'បញ្ជីកូដតាមសេវា (មានពណ៌ហានិភ័យ)', en: 'Code lists by service (with risk colours)' },
+  quick: { kh: 'បញ្ជីរហ័ស', en: 'Quick list' }, full: { kh: 'បញ្ជីពេញ', en: 'Full list' },
+  all: { kh: 'ទាំងអស់', en: 'All' }, filter: { kh: 'ច្រោះក្នុងបញ្ជីនេះ…', en: 'Filter this list…' },
+  chapters: { kh: 'ជំពូក ICD-10', en: 'ICD-10 chapters' }, codes: { kh: 'កូដ', en: 'codes' },
+  details: { kh: 'ព័ត៌មានលម្អិត', en: 'Details' },
+  codable: { kh: 'កូដនេះប្រើបាន — អាចកត់ក្នុងកំណត់ត្រា', en: 'Codable — you can record this code' },
+  heading: { kh: 'កូដក្បាលក្រុម — សូមជ្រើសកូដលម្អិតខាងក្រោម', en: 'Heading — please choose a more specific code below' },
+  local: { kh: 'កូដក្នុងស្រុក KCPH ឬមិនស្តង់ដារ — សូមពិនិត្យជាមួយ HIS មុនប្រើក្រៅ KCPH', en: 'KCPH local or non-standard code — check with your HIS before using it outside KCPH' },
+  riskBy: { kh: 'ពណ៌ហានិភ័យ KCPH តាមសេវា', en: 'KCPH risk colour by service' },
+  inherited: { kh: 'យកតាមកូដមេ', en: 'from parent code' },
+  noRisk: { kh: 'កូដនេះមិនទាន់មានពណ៌ហានិភ័យក្នុងបញ្ជីសេវា KCPH ទេ។', en: 'This code is not yet colour-coded in a KCPH service list.' },
+  moreSpecific: { kh: 'កូដលម្អិតជាងនេះ', en: 'More specific codes' },
+  addList: { kh: 'បន្ថែមក្នុងបញ្ជីអ្នកជំងឺ', en: 'Add to patient list' }, inList: { kh: '✓ មានក្នុងបញ្ជីហើយ', en: '✓ In patient list' },
+  fav: { kh: '☆ ចូលចិត្ត', en: '☆ Favourite' }, faved: { kh: '★ បានចូលចិត្ត', en: '★ Favourite' },
+  copy: { kh: 'ចម្លង', en: 'Copy' }, copied: { kh: 'បានចម្លង', en: 'Copied' },
+  report: { kh: 'រាយការណ៍បញ្ហា', en: 'Report a problem' },
+  plTitle: { kh: 'បញ្ជីកូដអ្នកជំងឺ', en: 'Patient code list' },
+  plHelp: { kh: 'កូដទីមួយ = រោគវិនិច្ឆ័យចម្បង។ ប្រើព្រួញដើម្បីប្តូរលំដាប់។ ទិន្នន័យរក្សាទុកតែលើឧបករណ៍នេះ។', en: 'First code = main diagnosis. Use the arrows to change the order. Saved only on this device.' },
+  plRef: { kh: 'លេខសម្គាល់អ្នកជំងឺ (ស្រេចចិត្ត)', en: 'Patient ID / reference (optional)' },
+  plEmpty: { kh: 'មិនទាន់មានកូដ។ ស្វែងរកកូដ ហើយចុច «បន្ថែមក្នុងបញ្ជីអ្នកជំងឺ»។', en: 'No codes yet. Search for a code and tap “Add to patient list”.' },
+  main: { kh: 'ចម្បង', en: 'Main' },
+  copyAll: { kh: 'ចម្លងទាំងអស់', en: 'Copy all' }, print: { kh: 'បោះពុម្ព / PDF', en: 'Print / PDF' }, excel: { kh: 'Excel', en: 'Excel' },
+  clear: { kh: 'លុបទាំងអស់', en: 'Clear' }, sure: { kh: 'ចុចម្តងទៀតដើម្បីលុប', en: 'Tap again to clear' },
+  fbTitle: { kh: 'រាយការណ៍បញ្ហា ឬផ្តល់យោបល់', en: 'Report a problem or suggestion' },
+  fbType: { kh: 'ប្រភេទ', en: 'Type' }, fbCode: { kh: 'កូដ ICD-10 (បើមាន)', en: 'ICD-10 code (if any)' },
+  fbMsg: { kh: 'សេចក្តីលម្អិត', en: 'Details' }, fbName: { kh: 'ឈ្មោះ (ស្រេចចិត្ត)', en: 'Your name (optional)' },
+  fbContact: { kh: 'ទូរស័ព្ទ ឬ Telegram (ស្រេចចិត្ត)', en: 'Phone or Telegram (optional)' },
+  fbFac: { kh: 'មូលដ្ឋានសុខាភិបាល', en: 'Health facility' },
+  send: { kh: 'ផ្ញើ', en: 'Send' }, cancel: { kh: 'បោះបង់', en: 'Cancel' },
+  sentOk: { kh: 'បានផ្ញើ។ សូមអរគុណ!', en: 'Sent. Thank you!' },
+  queued: { kh: 'រក្សាទុកហើយ — នឹងផ្ញើពេលមានអ៊ីនធឺណិត', en: 'Saved — will be sent when you are online' },
+  needMsg: { kh: 'សូមសរសេរសេចក្តីលម្អិត', en: 'Please write the details' },
+  fbT: { kh: ['កូដខ្វះ', 'ឈ្មោះខ្មែរ/អង់គ្លេសខុស', 'មិនយល់ស្របពណ៌ហានិភ័យ', 'បញ្ហាកម្មវិធី', 'យោបល់'], en: ['Missing code', 'Wrong Khmer/English label', 'Disagree with risk colour', 'App problem', 'Suggestion'] },
+  settings: { kh: 'ការកំណត់', en: 'Settings' }, language: { kh: 'ភាសា', en: 'Language' },
+  showFr: { kh: 'បង្ហាញឈ្មោះជំងឺជាភាសាបារាំង', en: 'Show French diagnosis names' },
+  myFac: { kh: 'មូលដ្ឋានសុខាភិបាលរបស់ខ្ញុំ (ស្រេចចិត្ត)', en: 'My health facility (optional)' },
+  myProv: { kh: 'ខេត្ត/រាជធានី', en: 'Province' },
+  install: { kh: 'ដំឡើងជាកម្មវិធីលើទូរស័ព្ទ', en: 'Install as an app' },
+  share: { kh: 'ចែករំលែកឧបករណ៍នេះ', en: 'Share this tool' },
+  howTo: { kh: 'របៀបប្រើ', en: 'How to use' },
+  legend: { kh: 'អត្ថន័យពណ៌', en: 'Colour meaning' },
+  tips: { kh: 'គន្លឹះដាក់កូដ', en: 'Coding tips' },
+  about: { kh: 'អំពីឧបករណ៍នេះ', en: 'About this tool' },
+  dev: { kh: 'អ្នកបង្កើត', en: 'Developed by' },
+  offlineOk: { kh: 'ដំណើរការដោយគ្មានអ៊ីនធឺណិត បន្ទាប់ពីបើកលើកដំបូង', en: 'Works offline after the first visit' },
+  pending: { kh: 'កំពុងរង់ចាំផ្ញើ', en: 'waiting to send' },
+  sendNow: { kh: 'ផ្ញើឥឡូវ', en: 'Send now' },
+  general: { kh: 'ផ្តល់យោបល់ទូទៅ', en: 'Send feedback' },
+  dept: { kh: 'ផ្នែករបស់ខ្ញុំ', en: 'My department' }, deptAll: { kh: 'ទាំងអស់', en: 'All' },
+  deptHelp: { kh: 'លទ្ធផលស្វែងរកនឹងបង្ហាញកូដផ្នែករបស់អ្នកមុនគេ', en: 'Search shows your department’s codes first' },
+  freq: { kh: 'កូដដែលខ្ញុំប្រើញឹកញាប់', en: 'My frequently used codes' },
+  tools: { kh: 'ឧបករណ៍', en: 'Tools' },
+  ckTitle: { kh: 'ពិនិត្យកូដ', en: 'Check codes' }, ckSub: { kh: 'បិទភ្ជាប់កូដពី EMR ឬរបាយការណ៍ ដើម្បីរកកូដខុស ឬមិនពេញលេញ', en: 'Paste codes from the EMR or a report to find wrong or incomplete codes' },
+  guideEn: { kh: 'សៀវភៅណែនាំ ICD-10 (English)', en: 'ICD-10 Application Guide (English)' }, guideKh: { kh: 'សៀវភៅណែនាំ ICD-10 (ខ្មែរ)', en: 'ICD-10 Application Guide (Khmer)' },
+  guideSub: { kh: 'វិធានដាក់កូដ ឧទាហរណ៍ និងកំហុសញឹកញាប់', en: 'Coding rules, examples and common errors' },
+  dym: { kh: 'តើអ្នកចង់រក', en: 'Did you mean' }, showingFor: { kh: 'បង្ហាញលទ្ធផលសម្រាប់', en: 'Showing results for' },
+  copyCodes: { kh: 'ចម្លងតែកូដ', en: 'Copy codes only' }, filterKids: { kh: 'ច្រោះកូដលម្អិត…', en: 'Filter the specific codes…' },
+  listen: { kh: 'កំពុងស្តាប់… និយាយឈ្មោះជំងឺ', en: 'Listening… say the diagnosis' }
+};
+const RISK = {
+  3: { kh: 'ក្រហម · ខ្ពស់', en: 'RED · High', d: { kh: 'គ្រោះថ្នាក់ — ធ្វើភ្លាម ហៅគ្រូពេទ្យជាន់ខ្ពស់', en: 'Danger — act now, call the senior doctor' } },
+  2: { kh: 'លឿង · មធ្យម', en: 'YELLOW · Moderate', d: { kh: 'ត្រូវការផែនការគ្រូពេទ្យក្នុងថ្ងៃដដែល', en: 'Needs a doctor’s plan the same day' } },
+  1: { kh: 'បៃតង · ទាប', en: 'GREEN · Low', d: { kh: 'ថែទាំធម្មតា តាមដានតាមកាលវិភាគ', en: 'Routine care and follow-up' } },
+  0: { kh: 'ប្រផេះ · កូដមូលហេតុ', en: 'GREY · Cause code', d: { kh: 'មូលហេតុខាងក្រៅ (របួស/ពុល) — ប្រើជាមួយកូដរបួស', en: 'External cause — use together with the injury code' } }
+};
+const SVC = {
+  ANC: { kh: 'មាតា និងទារក', en: 'Maternal & Newborn', s: { kh: 'ពិនិត្យផ្ទៃពោះ · សម្រាល · ក្រោយសម្រាល · ទារក', en: 'ANC · Delivery · PNC · Newborn' }, c: '#B4436C', i: 'ANC' },
+  NCD: { kh: 'ជំងឺមិនឆ្លង', en: 'NCD', s: { kh: 'លើសសម្ពាធឈាម និងទឹកនោមផ្អែមប្រភេទ២', en: 'Hypertension & type 2 diabetes' }, c: '#2B6CB0', i: 'NCD' },
+  MED: { kh: 'វេជ្ជសាស្ត្រផ្ទៃក្នុង', en: 'Internal Medicine', s: { kh: 'ជំងឺឆ្លង បេះដូង សួត ពោះវៀន តម្រងនោម ការពុល', en: 'Infections, heart, lungs, gut, kidney, poisoning' }, c: '#16323F', i: 'MED' },
+  SUR: { kh: 'វះកាត់ និងរបួស', en: 'Surgery & Trauma', s: { kh: 'ពោះស្រួចស្រាវ របួស រលាក ក្រោយវះកាត់', en: 'Acute abdomen, injuries, burns, post-op' }, c: '#8C4A1E', i: 'SUR' },
+  MH: { kh: 'សុខភាពផ្លូវចិត្ត', en: 'Mental Health', s: { kh: 'ធ្លាក់ទឹកចិត្ត គ្រឿងញៀន វិកលចរិក អត្តឃាត', en: 'Depression, substance use, psychosis, suicide risk' }, c: '#6B4C8C', i: 'MH' }
+};
+const SVC_ORDER = ['ANC', 'NCD', 'MED', 'SUR', 'MH'];
+const CH = [
+  ['A00', 'B99', 'Certain infectious and parasitic diseases', 'ជំងឺឆ្លង និងប៉ារ៉ាស៊ីតមួយចំនួន'],
+  ['C00', 'D49', 'Neoplasms', 'ដុំសាច់ និងមហារីក'],
+  ['D50', 'D89', 'Blood, blood-forming organs and immune disorders', 'ជំងឺឈាម សរីរាង្គបង្កើតឈាម និងប្រព័ន្ធភាពស៊ាំ'],
+  ['E00', 'E89', 'Endocrine, nutritional and metabolic diseases', 'ជំងឺក្រពេញអរម៉ូន អាហាររូបត្ថម្ភ និងមេតាបូលីស'],
+  ['F00', 'F99', 'Mental, behavioural and neurodevelopmental disorders', 'ជំងឺផ្លូវចិត្ត អាកប្បកិរិយា និងការលូតលាស់'],
+  ['G00', 'G99', 'Diseases of the nervous system', 'ជំងឺប្រព័ន្ធប្រសាទ'],
+  ['H00', 'H59', 'Diseases of the eye and adnexa', 'ជំងឺភ្នែក'],
+  ['H60', 'H95', 'Diseases of the ear and mastoid process', 'ជំងឺត្រចៀក'],
+  ['I00', 'I99', 'Diseases of the circulatory system', 'ជំងឺបេះដូង និងសរសៃឈាម'],
+  ['J00', 'J99', 'Diseases of the respiratory system', 'ជំងឺផ្លូវដង្ហើម'],
+  ['K00', 'K95', 'Diseases of the digestive system', 'ជំងឺប្រព័ន្ធរំលាយអាហារ'],
+  ['L00', 'L99', 'Diseases of the skin and subcutaneous tissue', 'ជំងឺស្បែក'],
+  ['M00', 'M99', 'Musculoskeletal system and connective tissue', 'ជំងឺឆ្អឹង សន្លាក់ និងសាច់ដុំ'],
+  ['N00', 'N99', 'Diseases of the genitourinary system', 'ជំងឺប្រព័ន្ធទឹកនោម និងប្រដាប់បន្តពូជ'],
+  ['O00', 'O9A', 'Pregnancy, childbirth and the puerperium', 'ការមានផ្ទៃពោះ ការសម្រាល និងក្រោយសម្រាល'],
+  ['P00', 'P96', 'Certain conditions originating in the perinatal period', 'ស្ថានភាពទារកក្នុងរយៈពេលជុំវិញកំណើត'],
+  ['Q00', 'Q99', 'Congenital malformations and chromosomal abnormalities', 'ពិការភាពពីកំណើត'],
+  ['R00', 'R99', 'Symptoms, signs and abnormal findings', 'រោគសញ្ញា សញ្ញា និងលទ្ធផលមិនប្រក្រតី'],
+  ['S00', 'T88', 'Injury, poisoning and other external consequences', 'របួស ការពុល និងផលវិបាកពីមូលហេតុខាងក្រៅ'],
+  ['U00', 'U85', 'Codes for special purposes', 'កូដសម្រាប់គោលបំណងពិសេស'],
+  ['V00', 'Y99', 'External causes of morbidity', 'មូលហេតុខាងក្រៅនៃជំងឺ និងរបួស'],
+  ['Z00', 'Z99', 'Factors influencing health status and contact with health services', 'កត្តាសុខភាព និងការមកទទួលសេវា'],
+  ['~', '~', 'KCPH local and non-standard codes', 'កូដក្នុងស្រុក KCPH និងកូដមិនស្តង់ដារ']
+];
+const PROV = ['Phnom Penh|ភ្នំពេញ', 'Banteay Meanchey|បន្ទាយមានជ័យ', 'Battambang|បាត់ដំបង', 'Kampong Cham|កំពង់ចាម', 'Kampong Chhnang|កំពង់ឆ្នាំង', 'Kampong Speu|កំពង់ស្ពឺ', 'Kampong Thom|កំពង់ធំ', 'Kampot|កំពត', 'Kandal|កណ្តាល', 'Kep|កែប', 'Koh Kong|កោះកុង', 'Kratie|ក្រចេះ', 'Mondulkiri|មណ្ឌលគិរី', 'Oddar Meanchey|ឧត្តរមានជ័យ', 'Pailin|ប៉ៃលិន', 'Preah Sihanouk|ព្រះសីហនុ', 'Preah Vihear|ព្រះវិហារ', 'Prey Veng|ព្រៃវែង', 'Pursat|ពោធិ៍សាត់', 'Ratanakiri|រតនគិរី', 'Siem Reap|សៀមរាប', 'Stung Treng|ស្ទឹងត្រែង', 'Svay Rieng|ស្វាយរៀង', 'Takeo|តាកែវ', 'Tbong Khmum|ត្បូងឃ្មុំ'];
+// Common abbreviations → words in the English titles
+const ABBR = {
+  htn: ['hypertension'], dm: ['diabetes'], t2dm: ['type 2 diabetes'], t1dm: ['type 1 diabetes'], gdm: ['gestational diabetes'],
+  copd: ['chronic obstructive pulmonary'], uti: ['urinary tract infection', 'cystitis'], tb: ['tuberculosis'], ptb: ['tuberculosis of lung'],
+  mi: ['myocardial infarction'], ami: ['myocardial infarction'], stemi: ['st elevation'], nstemi: ['non-st elevation'], acs: ['myocardial infarction', 'unstable angina'],
+  cva: ['cerebral infarction', 'stroke'], tia: ['transient cerebral ischemic'], hf: ['heart failure'], chf: ['heart failure'], af: ['atrial fibrillation'],
+  dvt: ['deep vein thrombosis', 'phlebitis and thrombophlebitis'], aki: ['acute kidney failure'], ckd: ['chronic kidney disease'], esrd: ['end stage renal'],
+  gerd: ['reflux'], pud: ['peptic ulcer'], ugib: ['gastrointestinal hemorrhage', 'hematemesis'], dhf: ['dengue'], dss: ['dengue'],
+  hbv: ['hepatitis b'], hcv: ['hepatitis c'], pph: ['postpartum hemorrhage'], aph: ['antepartum hemorrhage'], prom: ['premature rupture of membranes'], pprom: ['premature rupture of membranes'],
+  iugr: ['fetal growth'], fgr: ['fetal growth'], pih: ['gestational [pregnancy-induced] hypertension', 'gestational hypertension'], preeclampsia: ['pre-eclampsia'],
+  cs: ['cesarean'], lscs: ['cesarean'], svd: ['delivery'], anc: ['supervision of', 'antenatal'], pnc: ['postpartum', 'puerperium'],
+  nnj: ['neonatal jaundice'], lbw: ['low birth weight'], rds: ['respiratory distress'], urti: ['upper respiratory infection'], ari: ['acute upper respiratory', 'acute lower respiratory'],
+  age: ['gastroenteritis'], ptsd: ['post-traumatic stress'], ocd: ['obsessive'], adhd: ['attention-deficit'], gad: ['generalized anxiety'],
+  rta: ['traffic'], snakebite: ['snake venom'], bite: ['bite', 'venom'], dog: ['dog', 'rabies'], rtc: ['traffic'], tbi: ['intracranial injury'], op: ['organophosphate'], ards: ['respiratory distress syndrome'], dka: ['ketoacidosis'],
+  bph: ['hyperplasia of prostate'], ida: ['iron deficiency anemia'], sle: ['systemic lupus'], ra: ['rheumatoid arthritis'], oa: ['osteoarthritis', 'arthrosis'],
+  ncd: ['hypertension', 'diabetes'], std: ['sexually transmitted'], sti: ['sexually transmitted'], pid: ['inflammatory disease of female pelvic', 'pelvic inflammatory']
+};
+// Khmer clinical words → words used in the English titles (Khmer labels exist for only 687 codes)
+const KHDICT = {
+  'រលាកសួត': ['pneumonia'], 'របេងសួត': ['tuberculosis of lung'], 'របេង': ['tuberculosis'], 'គ្រុនចាញ់': ['malaria'], 'គ្រុនឈាម': ['dengue'], 'គ្រុនពោះវៀន': ['typhoid'],
+  'គ្រុនឈិក': ['chikungunya'], 'ក្តៅខ្លួន': ['fever'], 'គ្រុន': ['fever'], 'អាសន្នរោគ': ['cholera'], 'រាក': ['diarrhea', 'gastroenteritis'], 'ក្អួត': ['vomiting'],
+  'ក្អក': ['cough'], 'ហឺត': ['asthma'], 'ហត់': ['dyspnea', 'shortness of breath'], 'រលាកទងសួត': ['bronchitis'], 'ផ្តាសាយធំ': ['influenza'], 'ផ្តាសាយ': ['nasopharyngitis', 'upper respiratory'],
+  'រលាកបំពង់ក': ['pharyngitis'], 'រលាកទន្សិល': ['tonsillitis'], 'រលាកត្រចៀក': ['otitis'], 'រលាកភ្នែក': ['conjunctivitis'], 'ភ្នែកឡើងបាយ': ['cataract'],
+  'លើសសម្ពាធឈាម': ['hypertension', 'hypertensive'], 'សម្ពាធឈាមខ្ពស់': ['hypertension', 'hypertensive'], 'សម្ពាធឈាមទាប': ['hypotension'], 'ទឹកនោមផ្អែម': ['diabetes'],
+  'ខ្សោយបេះដូង': ['heart failure'], 'គាំងបេះដូង': ['myocardial infarction'], 'បេះដូងលោតញាប់': ['tachycardia'], 'បេះដូង': ['heart', 'cardiac'],
+  'ដាច់សរសៃឈាមខួរក្បាល': ['cerebral infarction', 'intracerebral hemorrhage', 'stroke'], 'ស្ទះសរសៃឈាមខួរក្បាល': ['cerebral infarction'], 'ឈឺទ្រូង': ['chest pain'],
+  'ខ្សោយតម្រងនោម': ['kidney failure', 'kidney disease'], 'គ្រួសក្នុងតម្រងនោម': ['calculus of kidney'], 'តម្រងនោម': ['kidney', 'renal'], 'គ្រួស': ['calculus'],
+  'រលាកផ្លូវនោម': ['urinary tract infection', 'cystitis'], 'រលាកប្លោកនោម': ['cystitis'], 'នោមមិនចេញ': ['retention of urine'], 'ប្រូស្តាត': ['prostat'],
+  'រលាកថ្លើម': ['hepatitis'], 'ក្រិនថ្លើម': ['cirrhosis'], 'ថ្លើម': ['liver', 'hepat'], 'រលាកលំពែង': ['pancreatitis'], 'ថង់ទឹកប្រមាត់': ['gallbladder', 'cholecyst'],
+  'រលាកក្រពះ': ['gastritis'], 'ដំបៅក្រពះ': ['gastric ulcer', 'peptic ulcer'], 'ក្រពះ': ['stomach', 'gastric'], 'ខ្នែងពោះវៀន': ['appendicitis', 'appendix'],
+  'ស្ទះពោះវៀន': ['intestinal obstruction'], 'រលាកស្រោមពោះ': ['peritonitis'], 'ក្លាន': ['hernia'], 'ឬសដូងបាត': ['hemorrhoid'], 'ទល់លាមក': ['constipation'], 'ឈឺពោះ': ['abdominal pain'],
+  'ហូរឈាមក្រពះពោះវៀន': ['gastrointestinal hemorrhage'], 'ក្អួតឈាម': ['hematemesis'], 'លាមកខ្មៅ': ['melena'],
+  'បាក់ឆ្អឹង': ['fracture'], 'ឆ្អឹង': ['bone'], 'របួសក្បាល': ['head injury', 'intracranial injury', 'concussion'], 'របួស': ['injury', 'wound'], 'រលាកភ្លើង': ['burn'], 'រលាក់': ['burn'],
+  'គ្រោះថ្នាក់ចរាចរណ៍': ['traffic'], 'ម៉ូតូ': ['motorcycle'], 'ធ្លាក់': ['fall'], 'ឆ្កែខាំ': ['bitten by dog'], 'ឆ្កែឆ្កួត': ['rabies'], 'ពស់ចឹក': ['snake'], 'ពស់': ['snake'],
+  'ថ្នាំសម្លាប់សត្វល្អិត': ['insecticide', 'organophosphate'], 'ពុល': ['poisoning', 'toxic effect'], 'អត្តឃាត': ['suicid', 'self-harm'],
+  'ស្លេកស្លាំង': ['anemia'], 'ខ្វះឈាម': ['anemia'], 'ខ្វះជាតិដែក': ['iron deficiency'], 'មហារីកសុដន់': ['malignant neoplasm of breast'], 'មហារីកមាត់ស្បូន': ['malignant neoplasm of cervix'],
+  'មហារីកថ្លើម': ['malignant neoplasm of liver'], 'មហារីក': ['malignant neoplasm'], 'ដុំសាច់': ['neoplasm', 'tumor'], 'ដុំពកក': ['goiter'], 'ពកក': ['goiter'], 'ទីរ៉ូអ៊ីត': ['thyroid'],
+  'ខ្វះអាហារូបត្ថម្ភ': ['malnutrition'], 'កង្វះអាហារូបត្ថម្ភ': ['malnutrition'], 'ខ្វះជាតិទឹក': ['dehydration'], 'ធាត់': ['obesity'], 'ខ្លាញ់ក្នុងឈាម': ['hyperlipidemia', 'cholesterol'],
+  'ប្រកាច់': ['convulsion', 'seizure', 'epilep'], 'ឆ្កួតជ្រូក': ['epilep'], 'ឈឺក្បាល': ['headache'], 'វិលមុខ': ['dizziness', 'vertigo'], 'សន្លប់': ['coma', 'syncope'],
+  'រលាកស្រោមខួរ': ['meningitis'], 'ខ្វិន': ['paralysis', 'hemiplegia'], 'ធ្លាក់ទឹកចិត្ត': ['depress'], 'ថប់បារម្ភ': ['anxiety'], 'វិកលចរិក': ['psycho', 'schizophren'],
+  'គ្រឿងស្រវឹង': ['alcohol'], 'ស្រា': ['alcohol'], 'គ្រឿងញៀន': ['abuse', 'dependence'], 'ឆ្កួត': ['dementia', 'psycho'],
+  'ឆ្លងរោគក្នុងឈាម': ['sepsis'], 'ស្ហុក': ['shock'], 'អេដស៍': ['hiv'], 'តេតាណូស': ['tetanus'], 'កញ្ជ្រឹល': ['measles'], 'អុតស្វាយ': ['varicella'], 'កមរមាស់': ['scabies'],
+  'រលាកស្បែក': ['dermatitis'], 'ហើម': ['edema', 'swelling'], 'ឈឺសន្លាក់': ['arthritis', 'arthrosis', 'joint'], 'ឈឺខ្នង': ['back pain', 'dorsalgia'],
+  'ពិនិត្យផ្ទៃពោះ': ['supervision of', 'anc'], 'មានផ្ទៃពោះ': ['pregnan'], 'ផ្ទៃពោះ': ['pregnan'], 'ក្រៅស្បូន': ['ectopic'], 'រលូតកូន': ['abortion'],
+  'វះកាត់យកកូន': ['cesarean', 'c-section'], 'សម្រាលកូន': ['delivery'], 'សម្រាល': ['delivery', 'labor'], 'ក្រោយសម្រាល': ['postpartum', 'puerperium'],
+  'ហូរឈាមក្រោយសម្រាល': ['postpartum hemorrhage'], 'ធ្លាក់ឈាមក្រោយសម្រាល': ['postpartum hemorrhage'], 'ក្រឡាភ្លើង': ['eclampsia'], 'ទឹកភ្លោះបែក': ['rupture of membranes'],
+  'កូនភ្លោះ': ['twin'], 'ទារកទើបកើត': ['newborn'], 'ទារក': ['newborn', 'fetus', 'fetal'], 'មិនគ្រប់ខែ': ['preterm'], 'ទម្ងន់ទាប': ['low birth weight'], 'ខាន់លឿង': ['jaundice'],
+  'ស្បូន': ['uter'], 'អូវែ': ['ovar'], 'សុដន់': ['breast'], 'រដូវ': ['menstrua'], 'ពន្យារកំណើត': ['contracept'], 'ចាក់ថ្នាំបង្ការ': ['vaccination', 'immunization'],
+  'ធ្មេញ': ['tooth', 'dental', 'caries'], 'ភ្នែក': ['eye'], 'ត្រចៀក': ['ear'], 'ហូរឈាម': ['hemorrhage', 'bleeding'], 'ឈឺ': ['pain'],
+  'ធ្ងន់': ['severe'], 'ស្រាល': ['mild'], 'មធ្យម': ['moderate'], 'រ៉ាំរ៉ៃ': ['chronic'], 'ស្រួចស្រាវ': ['acute'], 'ឆ្វេង': ['left'], 'ស្តាំ': ['right']
+};
+const KH_KEYS = Object.keys(KHDICT).sort((a, b) => b.length - a.length);
+const EN_OPT = ['severe', 'mild', 'moderate', 'left', 'right', 'acute', 'chronic', 'initial'];
+const KH_OPT = ['ធ្ងន់', 'ស្រាល', 'មធ្យម', 'រ៉ាំរ៉ៃ', 'ស្រួចស្រាវ', 'ឆ្វេង', 'ស្តាំ', 'ឈឺ'];   // details: rank higher, not required
+const KH_STOP = ['ជំងឺ', 'ការ', 'និង', 'មាន', 'ដោយ', 'នៃ', 'ក្នុង', 'ពី', 'លើ', 'របស់', 'ផ្នែក', 'អ្នក', 'រោគ', 'សង្ស័យ'];
+const isKh = s => /[\u1780-\u17FF]/.test(s);
+function khGroups(str) {
+  const groups = []; let rest = str.replace(/[\u200B\u200C\u200D]/g, '');
+  for (const k of KH_KEYS) if (rest.includes(k)) { const g = [k, ...KHDICT[k]]; if (KH_OPT.includes(k)) g.opt = true; groups.push(g); rest = rest.split(k).join(' '); }
+  for (const w of KH_STOP) rest = rest.split(w).join(' ');
+  rest.split(/\s+/).filter(x => x.length >= 2 && isKh(x)).forEach(x => { const g = [x]; g.opt = true; groups.push(g); });
+  return groups.length ? groups : [[str]];
+}
+function queryGroups(q) {
+  const out = [];
+  q.toLowerCase().split(/[\s,;]+/).filter(Boolean).forEach(w => { if (isKh(w)) out.push(...khGroups(w)); else { const g = tokVariants(w); if (EN_OPT.includes(w)) g.opt = true; out.push(g); } });
+  return out;
+}
+// spelling correction for English words ("pnemonia" → "pneumonia")
+let VOCAB = null, VOCABSTR = '';
+function buildVocab() {
+  const m = new Map();
+  for (let i = 0; i < EN.length; i++) for (const w of EN[i].toLowerCase().match(/[a-z][a-z-]{3,}/g) || []) m.set(w, (m.get(w) || 0) + 1);
+  VOCAB = [...m.entries()]; VOCABSTR = ' ' + VOCAB.map(x => x[0]).join(' ') + ' ';
+}
+function lev(a, b, max) {
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i]; let rowMin = i;
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (cur[j] < rowMin) rowMin = cur[j];
+    }
+    if (rowMin > max) return max + 1; prev = cur;
+  }
+  return prev[b.length];
+}
+function correctWord(w) {
+  if (w.length < 4 || isKh(w) || ABBR[w] || /\d/.test(w)) return null;
+  if (!VOCAB) buildVocab();
+  if (VOCABSTR.includes(w)) return null;
+  const max = w.length >= 7 ? 2 : 1; let best = null, bd = max + 1, bf = 0;
+  for (const [v, f] of VOCAB) { const d = lev(w, v, max); if (d < bd || (d === bd && d <= max && f > bf)) { bd = d; best = v; bf = f; } }
+  return bd <= max ? best : null;
+}
+let searchNote = null;
+const t = k => (T[k] ? T[k][S.lang] : k);
+const L = o => (o ? (o[S.lang] || o.en) : '');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const $ = s => document.querySelector(s);
+
+/* ---------- data ---------- */
+let C = [], EN = [], KHL = [], FL = [], FR = null, HAY = [], NORM = [], PAR, KIDS, IDX = new Map(), RISKS = {}, SVCD = {}, META = {};
+async function loadData() {
+  $('#ldLogo').src = LOGO;
+  const res = await fetch(DATA_URL);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  let txt;
+  if (res.body && res.body.getReader) {
+    const rd = res.body.getReader(); const chunks = []; let got = 0;
+    for (;;) {
+      const { done, value } = await rd.read(); if (done) break;
+      chunks.push(value); got += value.length;
+      $('#ldBar').style.width = Math.min(98, got / DATA_BYTES * 100) + '%';
+    }
+    const all = new Uint8Array(got); let o = 0; for (const c of chunks) { all.set(c, o); o += c.length; }
+    txt = new TextDecoder('utf-8').decode(all);
+  } else txt = await res.text();
+  const d = JSON.parse(txt);
+  META = { v: d.v, src: d.src }; RISKS = d.risk; SVCD = d.svc;
+  const n = d.codes.length;
+  C = new Array(n); EN = new Array(n); KHL = new Array(n); FL = new Uint8Array(n); HAY = new Array(n); NORM = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const r = d.codes[i]; C[i] = r[0]; EN[i] = r[1]; KHL[i] = r[2]; FL[i] = r[3];
+    IDX.set(r[0], i); NORM[i] = r[0].replace(/\./g, '').toUpperCase();
+    HAY[i] = (r[1] + ' ¦ ' + r[2]).toLowerCase();
+  }
+  PAR = new Int32Array(n).fill(-1); KIDS = new Array(n);
+  for (let i = 0; i < n; i++) {
+    let c = C[i];
+    while (c.length > 1) {
+      c = c.slice(0, -1).replace(/\.+$/, '');
+      const j = IDX.get(c);
+      if (j !== undefined && j !== i) { PAR[i] = j; (KIDS[j] || (KIDS[j] = [])).push(i); break; }
+    }
+  }
+  $('#ldBar').style.width = '100%';
+}
+async function loadFr() {
+  if (FR) return true;
+  try { const r = await fetch(FR_URL); FR = await r.json(); return true; } catch (e) { toast('French names not available offline yet'); return false; }
+}
+function chapterOf(i) {
+  if (FL[i] & 2 && PAR[i] < 0) return CH.length - 1;
+  const c3 = C[i].slice(0, 3).toUpperCase();
+  for (let k = 0; k < CH.length - 1; k++) if (c3 >= CH[k][0] && c3 <= CH[k][1]) return k;
+  return CH.length - 1;
+}
+/* risk lookup: own entry, else inherited from an ancestor that is a codable/report code */
+function riskInfo(i) {
+  const own = RISKS[C[i]];
+  if (own) return { m: own, inh: null };
+  let p = PAR[i];
+  while (p >= 0) {
+    const r = RISKS[C[p]];
+    if (r) {
+      const m = {}; let ok = false;
+      for (const s in r) if (r[s][1] !== 'h') { m[s] = [r[s][0], r[s][1], r[s][2]]; ok = true; }
+      return ok ? { m, inh: C[p] } : null;
+    }
+    p = PAR[p];
+  }
+  return null;
+}
+function maxRisk(i) {
+  const ri = riskInfo(i); if (!ri) return null;
+  let mx = -1, hd = false;
+  for (const s in ri.m) { if (ri.m[s][0] > mx) mx = ri.m[s][0]; if (ri.m[s][1] === 'h') hd = true; }
+  return mx < 0 ? null : { r: mx, hd };
+}
+function title(i, which) {
+  if (which === 'kh') return KHL[i];
+  return EN[i];
+}
+
+/* ---------- search ---------- */
+function tokVariants(tok) {
+  const v = new Set([tok]);
+  if (ABBR[tok]) ABBR[tok].forEach(x => v.add(x));
+  // British → American spellings used in the master list
+  const am = tok.replace(/ae/g, 'e').replace(/oe/g, 'e');
+  if (am !== tok) v.add(am);
+  if (tok === 'paediatric') v.add('pediatric');
+  return [...v];
+}
+function search(q, opts, noFix) {
+  q = q.trim(); if (!q) return [];
+  if (!noFix) searchNote = null;
+  const isCode = /^[a-z]{1,2}\d/i.test(q) && !/\s/.test(q);
+  let out = [];
+  if (isCode) {
+    const qn = q.replace(/\./g, '').toUpperCase();
+    for (let i = 0; i < C.length; i++) if (NORM[i].startsWith(qn) || C[i].toUpperCase().startsWith(q.toUpperCase())) out.push([i, (NORM[i] === qn ? 1e6 : 0) - NORM[i].length * 10]);
+    if (!out.length) { // tolerate "J189" style input
+      for (let i = 0; i < C.length; i++) if (NORM[i].includes(qn)) out.push([i, -NORM[i].length]);
+    }
+  } else {
+    const ql = q.toLowerCase();
+    const groups = queryGroups(q);
+    let req = groups.filter(g => !g.opt), opt = groups.filter(g => g.opt);
+    if (!req.length) { req = groups; opt = []; }
+    const has = (h, alts) => { for (const a of alts) if (h.includes(a)) return true; return false; };
+    const first = req[0] || [];
+    const score = (i, h) => {
+      let sc = 0;
+      if (h.startsWith(ql)) sc += 120;
+      for (const a of first) { if (h.startsWith(a)) sc += 80; else if (h.includes(' ' + a)) sc += 25; }
+      for (const g of opt) if (has(h, g)) sc += 40;
+      if (FL[i] & 1) sc += 45;
+      if (RISKS[C[i]]) sc += 35;
+      if (S.dept && RISKS[C[i]] && RISKS[C[i]][S.dept]) sc += 70;
+      if (!KIDS[i]) sc += 10;
+      if (C[i].length === 8 && C[i].endsWith('A')) sc += 6;   // initial encounter is the usual choice
+      return sc - C[i].length * 3 - EN[i].length / 15;
+    };
+    for (let i = 0; i < C.length; i++) {
+      const h = HAY[i]; let ok = true;
+      for (const g of req) if (!has(h, g)) { ok = false; break; }
+      if (ok) out.push([i, score(i, h)]);
+    }
+    // nothing matched every word → first try spelling correction
+    if (!out.length && !noFix) {
+      const words = ql.split(/[\s,;]+/).filter(Boolean); let changed = false;
+      const fixed = words.map(w => { const c = correctWord(w); if (c && c !== w) { changed = true; return c; } return w; });
+      if (changed) { const q2 = fixed.join(' '); const r2 = search(q2, opts, true); if (r2.length) { searchNote = { from: q, to: q2 }; return r2; } }
+    }
+    // still nothing → show codes that match most of the words
+    if (!out.length && req.length > 1) {
+      const need = Math.ceil(req.length / 2);
+      for (let i = 0; i < C.length; i++) {
+        const h = HAY[i]; let n = 0;
+        for (const g of req) if (has(h, g)) n++;
+        if (n >= need) out.push([i, n * 100 + score(i, h)]);
+      }
+    }
+  }
+  let r = out;
+  if (opts.leaf) r = r.filter(x => !KIDS[x[0]]);
+  if (opts.kcph) r = r.filter(x => riskInfo(x[0]));
+  if (opts.key) r = r.filter(x => FL[x[0]] & 1);
+  if (opts.r3) r = r.filter(x => { const m = maxRisk(x[0]); return m && m.r === 3 && !m.hd; });
+  r.sort((a, b) => b[1] - a[1] || (a[0] - b[0]));
+  return r.map(x => x[0]);
+}
+function hl(text, q) {
+  const s = esc(text); if (!q) return s;
+  const words = queryGroups(q).flat().filter(w => w.length > 1 && !isKh(w));
+  if (!words.length) return s;
+  const re = new RegExp('(' + words.map(w => esc(w).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'ig');
+  return s.replace(re, '<mark>$1</mark>');
+}
+
+/* ---------- row rendering ---------- */
+function riskBadge(r, hd) {
+  if (r == null) return '';
+  return `<span class="rb r${r}">${hd ? (S.lang === 'kh' ? 'រហូតដល់ ' : 'up to ') : ''}${esc(L(RISK[r]))}</span>`;
+}
+function rowHTML(i, q, opt) {
+  opt = opt || {};
+  const mr = maxRisk(i);
+  const kh = KHL[i], en = EN[i];
+  const primary = S.lang === 'kh' && kh ? kh : en;
+  const secondary = S.lang === 'kh' && kh ? en : kh;
+  const kids = KIDS[i] ? KIDS[i].length : 0;
+  const note = opt.note || '';
+  const inL = listHas(C[i]);
+  return `<div class="row r${mr ? mr.r : 'x'}" role="button" tabindex="0" data-i="${i}" ${opt.drill ? 'data-drill="1"' : ''}>
+    <span class="cd mono">${esc(C[i])}</span>
+    <span class="tx"><span class="t1">${primary === en ? hl(en, q) : esc(primary)}</span>
+    ${secondary ? `<span class="t2" style="display:block">${secondary === en ? hl(en, q) : esc(secondary)}</span>` : ''}
+    ${S.fr && FR && FR[i] ? `<span class="t3" style="display:block"><i>${esc(FR[i])}</i></span>` : ''}
+    ${note ? `<span class="t3" style="display:block">${esc(note)}</span>` : ''}
+    <span class="tags">${mr ? riskBadge(mr.r, mr.hd) : ''}${kids ? `<span class="tag h">${S.lang === 'kh' ? 'ក្បាលក្រុម' : 'Heading'} · ${kids}</span>` : `<span class="tag ok">✓ ${S.lang === 'kh' ? 'ប្រើបាន' : 'Codable'}</span>`}${FL[i] & 1 ? '<span class="tag k">★ KCPH</span>' : ''}${FL[i] & 2 ? `<span class="tag l">${S.lang === 'kh' ? 'កូដក្នុងស្រុក' : 'Local'}</span>` : ''}</span></span>
+    ${opt.noAct ? '<span class="go">›</span>' : `<span class="ra-w"><button class="ra" data-act="cp" data-c="${i}" title="${t('copy')}" aria-label="${t('copy')} ${esc(C[i])}">⧉</button><button class="ra ${inL ? 'done' : ''}" data-act="add" data-c="${i}" title="${t('addList')}" aria-label="${t('addList')}">${inL ? '✓' : '＋'}</button></span>`}</div>`;
+}
+let LISTSET = null;
+function listHas(c) { if (!LISTSET) LISTSET = new Set(store.get('list', []).map(x => x.c)); return LISTSET.has(c); }
+function bumpFreq(c, w) { const f = store.get('freq', {}); f[c] = (f[c] || 0) + (w || 1); const k = Object.keys(f); if (k.length > 300) { k.sort((a, b) => f[a] - f[b]).slice(0, k.length - 300).forEach(x => delete f[x]); } store.set('freq', f); }
+function bindActs(root) {
+  if (!root) return;
+  root.querySelectorAll('[data-act]').forEach(b => b.onclick = e => {
+    e.stopPropagation(); const i = +b.dataset.c;
+    if (b.dataset.act === 'cp') { copyText(C[i]); bumpFreq(C[i], 2); }
+    else if (!listHas(C[i])) { addToList(i); b.classList.add('done'); b.textContent = '✓'; } else toast(t('inList'));
+  });
+}
+function bindRows(root) {
+  root.querySelectorAll('.row[data-i]').forEach(b => {
+    b.onclick = () => {
+      const i = +b.dataset.i;
+      if (b.dataset.drill && KIDS[i]) { brPath.push(i); renderBrowse(); window.scrollTo(0, 0); } else openDetail(i);
+    };
+    b.onkeydown = e => { if (e.key === 'Enter' && e.target === b) b.click(); };
+  });
+  root.querySelectorAll('[data-act]').forEach(b => b.onclick = e => {
+    e.stopPropagation(); const i = +b.dataset.c;
+    if (b.dataset.act === 'cp') { copyText(C[i]); bumpFreq(C[i], 2); }
+    else if (!listHas(C[i])) { addToList(i); b.classList.add('done'); b.textContent = '✓'; }
+    else toast(t('inList'));
+  });
+}
+function listBlock(ids, q, limit, key, extra) {
+  const lim = pageLim[key] || limit;
+  const html = ids.slice(0, lim).map(i => rowHTML(i, q, extra && extra(i))).join('');
+  return `<div class="list">${html}</div>${ids.length > lim ? `<button class="more" data-more="${key}">${t('showMore')} (${(ids.length - lim).toLocaleString()})</button>` : ''}`;
+}
+const pageLim = {};
+
+/* ---------- views ---------- */
+let view = 'search';
+function show(v, keep) {
+  view = v;
+  document.querySelectorAll('.view').forEach(e => e.classList.toggle('on', e.id === 'v-' + v));
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  if (v === 'check') renderCheck(); else if (v === 'report') renderReport(); else if (v === 'services') renderServices(); else if (v === 'browse') renderBrowse(); else if (v === 'mylist') renderList(); else if (v === 'help') renderHelp(); else renderSearch();
+  if (!keep) window.scrollTo(0, 0);
+}
+/* SEARCH */
+const F = { leaf: !!S.leafOnly, kcph: false, key: false, r3: false };
+let sTimer, lastQ = '', lastRes = [];
+function renderSearch() {
+  const q = $('#q').value;
+  $('#qClr').classList.toggle('hidden', !q);
+  document.querySelectorAll('#fChips .chip').forEach(c => c.classList.toggle('on', !!F[c.dataset.f]));
+  const out = $('#sOut');
+  if (!q.trim()) {
+    const rec = store.get('recent', []).map(c => IDX.get(c)).filter(x => x !== undefined).slice(0, 8);
+    const fav = store.get('fav', []).map(c => IDX.get(c)).filter(x => x !== undefined);
+    const ex = ['J18', 'dengue', 'HTN', 'រលាកសួត', 'ទឹកនោមផ្អែម', 'pre-eclampsia', 'pnemonia', 'ពស់ចឹក', 'O80'];
+    const fr = store.get('freq', {}); const freq = Object.keys(fr).sort((a, b) => fr[b] - fr[a]).map(c => IDX.get(c)).filter(x => x !== undefined).slice(0, 10);
+    out.innerHTML = `
+      <div class="meta">${t('tryEx')}:</div>
+      <div class="chips" id="exChips">${ex.map(e => `<button class="chip" data-ex="${esc(e)}">${esc(e)}</button>`).join('')}</div>
+      <div class="sec">${t('dept')}</div>
+      <div class="chips" style="margin-top:0">${['', ...SVC_ORDER].map(k => `<button class="chip ${S.dept === k ? 'on' : ''}" data-dept="${k}">${esc(k ? L(SVC[k]) : t('deptAll'))}</button>`).join('')}</div>
+      <p class="small muted" style="margin:-4px 2px 6px">${t('deptHelp')}${S.dept ? ` · <a href="#" id="deptQL">${t('quick')} ›</a>` : ''}</p>
+      ${freq.length ? `<div class="sec">${t('freq')}</div><div class="list">${freq.map(i => rowHTML(i)).join('')}</div>` : ''}
+      <div class="sec">${t('tools')}</div>
+      <div class="tools">
+        <button class="tool" data-go="check"><span class="ti">✔</span><span><b>${t('ckTitle')}</b><span>${t('ckSub')}</span></span></button>
+        <a class="tool" href="guide-${S.lang === 'kh' ? 'kh' : 'en'}.html"><span class="ti">📘</span><span><b>${t(S.lang === 'kh' ? 'guideKh' : 'guideEn')}</b><span>${t('guideSub')}</span></span></a>
+        <a class="tool" href="guide-${S.lang === 'kh' ? 'en' : 'kh'}.html"><span class="ti">📗</span><span><b>${t(S.lang === 'kh' ? 'guideEn' : 'guideKh')}</b><span>${t('guideSub')}</span></span></a>
+      </div>
+      <div class="sec">${t('svcTitle')}</div>
+      <div class="grid">${SVC_ORDER.map(svcCard).join('')}</div>
+      ${fav.length ? `<div class="sec">${t('favs')}</div><div class="list">${fav.map(i => rowHTML(i)).join('')}</div>` : ''}
+      ${rec.length ? `<div class="sec">${t('recent')}</div><div class="list">${rec.map(i => rowHTML(i)).join('')}</div>` : ''}
+      <div class="sec">${t('legend')}</div>${legendHTML()}
+      ${creditHTML()}`;
+    out.querySelectorAll('[data-ex]').forEach(b => b.onclick = () => { $('#q').value = b.dataset.ex; doSearch(); });
+    out.querySelectorAll('[data-dept]').forEach(b => b.onclick = () => { S.dept = b.dataset.dept; saveS(); renderSearch(); });
+    const dq = $('#deptQL'); if (dq) dq.onclick = e => { e.preventDefault(); curSvc = S.dept; svcMode = 'q'; show('services'); };
+    out.querySelectorAll('[data-go]').forEach(b => b.onclick = () => show(b.dataset.go));
+    out.querySelectorAll('[data-svc]').forEach(b => b.onclick = () => { curSvc = b.dataset.svc; show('services'); });
+    bindRows(out);
+    return;
+  }
+  if (q !== lastQ) { lastQ = q; pageLim.s = 0; }
+  lastRes = search(q, F);
+  out.innerHTML = (searchNote ? `<div class="dym">${t('showingFor')} <b>${esc(searchNote.to)}</b> · ${S.lang === 'kh' ? 'មិនឃើញ' : 'no match for'} “${esc(searchNote.from)}”</div>` : '') +
+    `<div class="meta">${lastRes.length.toLocaleString()} ${t('results')}${S.dept ? ' · ' + esc(L(SVC[S.dept])) + ' ' + (S.lang === 'kh' ? 'មុនគេ' : 'first') : ''}</div>` +
+    (lastRes.length ? listBlock(lastRes, q, 40, 's') : `<div class="empty">${t('noRes')}</div>`);
+  bindRows(out);
+  const m = out.querySelector('[data-more]'); if (m) m.onclick = () => { pageLim.s = (pageLim.s || 40) + 60; renderSearch(); };
+}
+let cTimer, lastCounted = '';
+function doSearch() {
+  clearTimeout(sTimer); sTimer = setTimeout(() => { pageLim.s = 0; renderSearch(); }, 160);
+  // count one search when the user stops typing (not every key press)
+  clearTimeout(cTimer); cTimer = setTimeout(() => { const q = $('#q').value.trim(); if (q.length >= 2 && q !== lastCounted) { lastCounted = q; countUse('search'); } }, 1500);
+}
+function svcCard(k) {
+  const s = SVC[k];
+  return `<button class="svc" data-svc="${k}"><span class="ico" style="background:${s.c}">${s.i}</span><span><b>${esc(L(s))}</b><span>${esc(L(s.s))}</span></span></button>`;
+}
+function legendHTML() {
+  return `<div class="card pad"><div class="list" style="gap:10px">${[3, 2, 1, 0].map(r => `<div>${riskBadge(r)} <span class="small">${esc(L(RISK[r].d))}</span></div>`).join('')}</div>
+  <p class="small muted" style="margin:10px 0 0">${S.lang === 'kh' ? 'ពណ៌ជាជំនួយក្នុងការចាត់ថ្នាក់ មិនជំនួសការវិនិច្ឆ័យគ្លីនិកទេ។ ពណ៌រៀបចំដោយ KCPH សម្រាប់ ៥ សេវា។' : 'Colours are a triage aid prepared by KCPH for 5 services; they do not replace clinical judgement.'}</p></div>`;
+}
+function creditHTML() {
+  return `<div class="credit">${t('dev')} <b>${AUTHOR_EN}</b><br>${S.lang === 'kh' ? AUTHOR_ROLE_KH : AUTHOR_ROLE_EN}<br><span class="small">© ${new Date().getFullYear()} KCPH · v${APP_VERSION}</span></div>`;
+}
+
+/* SERVICES */
+let curSvc = null, svcMode = 'q', svcRisk = 0, svcFilter = '';
+function renderServices() {
+  const out = $('#svcOut');
+  if (!curSvc) {
+    out.innerHTML = `<h2 class="vt">${t('svcTitle')}</h2><div class="grid">${SVC_ORDER.map(svcCard).join('')}</div>
+      <div class="sec">${t('legend')}</div>${legendHTML()}${creditHTML()}`;
+    out.querySelectorAll('[data-svc]').forEach(b => b.onclick = () => { curSvc = b.dataset.svc; svcMode = 'q'; svcRisk = 0; svcFilter = ''; renderServices(); window.scrollTo(0, 0); });
+    return;
+  }
+  const s = SVC[curSvc], d = SVCD[curSvc];
+  const f = svcFilter.trim().toLowerCase();
+  const pass = i => {
+    if (i === undefined) return false;
+    if (f && !(C[i].toLowerCase().includes(f) || HAY[i].includes(f))) return false;
+    if (svcRisk) { const r = RISKS[C[i]] && RISKS[C[i]][curSvc]; if (!r || r[0] !== svcRisk || r[1] === 'h') return false; }
+    return true;
+  };
+  const noteOf = i => { const r = RISKS[C[i]] && RISKS[C[i]][curSvc]; return r && r[2] ? { note: r[2] } : null; };
+  let body = '';
+  if (svcMode === 'q') {
+    let lastA = null;
+    for (const g of d.q) {
+      const ids = g.c.map(c => IDX.get(c)).filter(pass); if (!ids.length) continue;
+      if (g.a !== lastA) { body += `<div class="sec">${esc(g.a)}</div>`; lastA = g.a; }
+      body += `<div class="grp">${esc(g.s)}</div><div class="list">${ids.map(i => rowHTML(i, f, noteOf(i))).join('')}</div>`;
+    }
+  } else {
+    for (const sh of d.sh) {
+      let part = '';
+      for (const g of sh.g) {
+        const ids = g.c.map(c => IDX.get(c)).filter(pass); if (!ids.length) continue;
+        const key = curSvc + sh.n + g.n; const lim = pageLim[key] || 25;
+        part += `<div class="grp">${esc(g.n)} <span class="muted">(${ids.length})</span></div><div class="list">${ids.slice(0, lim).map(i => rowHTML(i, f, noteOf(i))).join('')}</div>` +
+          (ids.length > lim ? `<button class="more" data-more="${esc(key)}">${t('showMore')} (${ids.length - lim})</button>` : '');
+      }
+      if (part) body += `<div class="sec">${esc(sh.n)}</div>` + part;
+    }
+  }
+  out.innerHTML = `<div class="crumbs"><button id="svcBack">‹ ${t('tServices')}</button></div>
+    <div class="svc" style="box-shadow:none;margin-bottom:10px"><span class="ico" style="background:${s.c}">${s.i}</span><span><b>${esc(L(s))}</b><span>${esc(L(s.s))}</span></span></div>
+    <div class="seg"><button data-m="q" class="${svcMode === 'q' ? 'on' : ''}">${t('quick')}</button><button data-m="f" class="${svcMode === 'f' ? 'on' : ''}">${t('full')}</button></div>
+    <input class="in" id="svcF" placeholder="${t('filter')}" value="${esc(svcFilter)}">
+    <div class="chips"><button class="chip ${!svcRisk ? 'on' : ''}" data-r="0">${t('all')}</button>${[3, 2, 1].map(r => `<button class="chip r${r} ${svcRisk === r ? 'on' : ''}" data-r="${r}">${esc(L(RISK[r]))}</button>`).join('')}</div>
+    ${body || `<div class="empty">${t('noRes')}</div>`}
+    <div class="btns" style="margin-top:14px"><button class="btn g" id="svcXls">⬇ ${t('excel')}</button></div>`;
+  $('#svcBack').onclick = () => { curSvc = null; renderServices(); };
+  out.querySelectorAll('.seg button').forEach(b => b.onclick = () => { svcMode = b.dataset.m; renderServices(); });
+  out.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { svcRisk = +b.dataset.r; renderServices(); });
+  const inp = $('#svcF'); inp.oninput = () => { svcFilter = inp.value; clearTimeout(sTimer); sTimer = setTimeout(() => { renderServices(); const n = $('#svcF'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 250); };
+  out.querySelectorAll('[data-more]').forEach(b => b.onclick = () => { const k = b.dataset.more; pageLim[k] = (pageLim[k] || 25) + 100; renderServices(); });
+  $('#svcXls').onclick = () => exportService();
+  bindRows(out);
+}
+function exportService() {
+  const d = SVCD[curSvc], s = SVC[curSvc]; const rows = [];
+  const push = (sec, grp, c) => { const i = IDX.get(c); if (i === undefined) return; const r = RISKS[c] && RISKS[c][curSvc];
+    rows.push([sec, grp, c, r ? (r[1] === 'h' ? 'up to ' : '') + RISK[r[0]].en : '', KIDS[i] ? 'Heading' : 'Codable', EN[i], KHL[i], r ? r[2] : '']); };
+  if (svcMode === 'q') d.q.forEach(g => g.c.forEach(c => push(g.a, g.s, c))); else d.sh.forEach(sh => sh.g.forEach(g => g.c.forEach(c => push(sh.n, g.n, c))));
+  xlsx(`KCPH_ICD10_${curSvc}_${svcMode === 'q' ? 'Quick' : 'Full'}`, `${s.en} – ${svcMode === 'q' ? 'Quick list' : 'Full list'}`,
+    ['Section', 'Group', 'Code', 'KCPH risk', 'Level', 'Diagnosis (English)', 'Diagnosis (Khmer)', 'Coding note'], rows, [22, 30, 11, 18, 10, 60, 40, 50]);
+}
+
+/* BROWSE */
+let brPath = [];   // [chapterIndex(as -k-1), codeIdx, codeIdx...]
+let chapTop = null;
+function renderBrowse() {
+  const out = $('#brOut');
+  if (!chapTop) {
+    chapTop = CH.map(() => []);
+    for (let i = 0; i < C.length; i++) if (PAR[i] < 0) chapTop[chapterOf(i)].push(i);
+  }
+  const crumbs = [`<button data-cr="-1">${t('chapters')}</button>`];
+  brPath.forEach((p, k) => crumbs.push(`<i>›</i><button data-cr="${k}">${p < 0 ? esc(CH[-p - 1][0] === '~' ? 'Local' : CH[-p - 1][0] + '–' + CH[-p - 1][1]) : esc(C[p])}</button>`));
+  let body = '';
+  if (!brPath.length) {
+    body = `<div class="list">${CH.map((c, k) => `<button class="row" data-ch="${k}"><span class="cd mono" style="min-width:96px">${c[0] === '~' ? '★' : esc(c[0] + '–' + c[1])}</span><span class="tx"><span class="t1">${esc(S.lang === 'kh' ? c[3] : c[2])}</span><span class="t2" style="display:block">${esc(S.lang === 'kh' ? c[2] : c[3])}</span><span class="t3" style="display:block">${chapTop[k].length.toLocaleString()} ${S.lang === 'kh' ? 'ក្រុម' : 'categories'}</span></span><span class="go">›</span></button>`).join('')}</div>`;
+  } else {
+    const top = brPath[brPath.length - 1];
+    let ids;
+    if (top < 0) ids = chapTop[-top - 1];
+    else { ids = KIDS[top] || []; body += `<div class="node">${rowHTML(top)}</div>`; }
+    body += `<div class="meta">${ids.length.toLocaleString()} ${t('codes')}</div>` + listBlock(ids, '', 80, 'br' + top, () => ({ drill: true }));
+  }
+  out.innerHTML = `<h2 class="vt">${t('chapters')}</h2><div class="crumbs">${crumbs.join('')}</div>${body}`;
+  out.querySelectorAll('[data-cr]').forEach(b => b.onclick = () => { const k = +b.dataset.cr; brPath = brPath.slice(0, k + 1); renderBrowse(); });
+  out.querySelectorAll('[data-ch]').forEach(b => b.onclick = () => { brPath = [-(+b.dataset.ch) - 1]; renderBrowse(); window.scrollTo(0, 0); });
+  out.querySelectorAll('.list .row[data-i]').forEach(b => b.dataset.drill = '1');
+  const nodeRow = out.querySelector('.node .row'); if (nodeRow) delete nodeRow.dataset.drill;
+  out.querySelectorAll('[data-more]').forEach(b => b.onclick = () => { const k = b.dataset.more; pageLim[k] = (pageLim[k] || 80) + 200; renderBrowse(); });
+  bindRows(out);
+}
+
+/* DETAIL */
+function openDetail(i, refresh) {
+  const rec = store.get('recent', []).filter(c => c !== C[i]); rec.unshift(C[i]); store.set('recent', rec.slice(0, 30));
+  if (!refresh) { countUse('view', C[i]); bumpFreq(C[i], 1); }
+  const path = []; let p = PAR[i]; while (p >= 0) { path.unshift(p); p = PAR[p]; }
+  const ch = CH[chapterOf(path.length ? path[0] : i)];
+  const ri = riskInfo(i);
+  const kids = KIDS[i] || [];
+  const inList = store.get('list', []).some(x => x.c === C[i]);
+  const isFav = store.get('fav', []).includes(C[i]);
+  let rk = '';
+  if (ri) {
+    for (const s of (S.dept ? [S.dept, ...SVC_ORDER.filter(x => x !== S.dept)] : SVC_ORDER)) if (ri.m[s]) {
+      const v = ri.m[s];
+      rk += `<div class="rk"><div class="h">${riskBadge(v[0], v[1] === 'h')}<span>${esc(L(SVC[s]))}</span>${ri.inh ? `<span class="tag h">${t('inherited')} ${esc(ri.inh)}</span>` : ''}</div>${v[2] ? `<p>${esc(v[2])}</p>` : ''}</div>`;
+    }
+  } else rk = `<p class="small muted">${t('noRisk')}</p>`;
+  const html = `<div class="grab"></div>
+    <div class="sh-top"><span class="bigcode mono">${esc(C[i])}</span><button class="btn g" id="dCopy" style="padding:6px 12px">⧉ ${t('copy')}</button><button class="x" id="dX" aria-label="Close">×</button></div>
+    <div class="crumbs" style="margin:8px 0 0">${esc(S.lang === 'kh' ? ch[3] : ch[2])}${path.map(x => ` <i>›</i> <button data-go="${x}">${esc(C[x])}</button>`).join('')}</div>
+    <div class="ttlen">${esc(EN[i])}</div>
+    ${KHL[i] ? `<div class="ttlkh">★ ${esc(KHL[i])}</div>` : ''}
+    ${S.fr && FR && FR[i] ? `<div class="ttlfr">${esc(FR[i])}</div>` : ''}
+    ${kids.length ? `<div class="stat hd">⚠ <span>${t('heading')} (${kids.length})</span></div>` : `<div class="stat ok">✓ <span>${t('codable')}</span></div>`}
+    ${FL[i] & 2 ? `<div class="stat lc">ⓘ <span>${t('local')}</span></div>` : ''}
+    <div class="sec" style="margin-top:6px">${t('riskBy')}</div>${rk}
+    <div class="acts">
+      <button class="btn p" id="dAdd" ${inList ? 'disabled' : ''}>${inList ? t('inList') : '＋ ' + t('addList')}</button>
+      <button class="btn" id="dFav">${isFav ? t('faved') : t('fav')}</button>
+      <button class="btn g" id="dRep" style="grid-column:1/-1">⚑ ${t('report')}</button>
+    </div>
+    ${kids.length ? `<div class="sec">${t('moreSpecific')}</div>${kids.length > 12 ? `<input class="in" id="dKF" placeholder="${t('filterKids')}" style="margin-bottom:8px">` : ''}<div class="list" id="dKids">${kids.slice(0, 200).map(k => rowHTML(k)).join('')}</div>${kids.length > 200 ? `<p class="small muted">+${kids.length - 200}</p>` : ''}` : ''}
+    <p class="small muted" style="margin-top:14px">${esc(META.src || '')}</p>`;
+  const ov = sheet(html);
+  ov.querySelector('#dX').onclick = closeSheet;
+  ov.querySelector('#dCopy').onclick = () => copyText(`${C[i]} – ${EN[i]}${KHL[i] ? ' (' + KHL[i] + ')' : ''}`);
+  ov.querySelector('#dAdd').onclick = () => { addToList(i); openDetail(i, true); };
+  ov.querySelector('#dFav').onclick = () => { let f = store.get('fav', []); f = f.includes(C[i]) ? f.filter(x => x !== C[i]) : [C[i], ...f]; store.set('fav', f.slice(0, 100)); openDetail(i, true); };
+  ov.querySelector('#dRep').onclick = () => openFeedback(C[i]);
+  ov.querySelectorAll('[data-go]').forEach(b => b.onclick = () => openDetail(+b.dataset.go));
+  ov.querySelectorAll('#dKids .row').forEach(b => b.onclick = () => openDetail(+b.dataset.i));
+  bindActs(ov.querySelector('#dKids'));
+  const kf = ov.querySelector('#dKF');
+  if (kf) kf.oninput = () => { const f = kf.value.trim().toLowerCase(); const ids = kids.filter(k => !f || C[k].toLowerCase().includes(f) || HAY[k].includes(f)).slice(0, 200);
+    const box = ov.querySelector('#dKids'); box.innerHTML = ids.map(k => rowHTML(k, f)).join(''); box.querySelectorAll('.row').forEach(b => b.onclick = () => openDetail(+b.dataset.i)); bindActs(box); };
+}
+let curOv = null;
+function sheet(html) {
+  closeSheet(true);
+  const ov = document.createElement('div'); ov.className = 'ov';
+  ov.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">${html}</div>`;
+  ov.addEventListener('click', e => { if (e.target === ov) closeSheet(); });
+  document.body.appendChild(ov); curOv = ov; document.body.style.overflow = 'hidden';
+  if (!history.state || !history.state.sheet) history.pushState({ sheet: 1 }, '');
+  return ov;
+}
+function closeSheet(silent) {
+  if (curOv) { curOv.remove(); curOv = null; document.body.style.overflow = ''; if (!silent && history.state && history.state.sheet) history.back(); }
+  if (!silent) show(view, true);
+}
+window.addEventListener('popstate', () => { if (curOv) { curOv.remove(); curOv = null; document.body.style.overflow = ''; show(view, true); } });
+
+/* MY LIST */
+function addToList(i) {
+  const l = store.get('list', []); if (!l.some(x => x.c === C[i])) l.push({ c: C[i] }); store.set('list', l); LISTSET = null; bumpFreq(C[i], 2); updCount(); toast('＋ ' + C[i]); countUse('add', C[i]);
+}
+function updCount() { const n = store.get('list', []).length; const e = $('#listCnt'); e.textContent = n; e.classList.toggle('hidden', !n); }
+let clearArm = false;
+function renderList() {
+  const out = $('#mlOut');
+  const l = store.get('list', []); const ref = store.get('ref', '');
+  const fav = store.get('fav', []).map(c => IDX.get(c)).filter(x => x !== undefined);
+  const items = l.map((x, k) => { const i = IDX.get(x.c); if (i === undefined) return ''; const mr = maxRisk(i);
+    return `<div class="pi"><span class="n ${k === 0 ? 'm' : ''}">${k + 1}</span><div class="b" data-open="${i}"><div class="c"><span class="mono">${esc(x.c)}</span> ${k === 0 ? `<span class="tag k">${t('main')}</span>` : ''} ${mr ? riskBadge(mr.r, mr.hd) : ''}</div><div class="d">${esc(EN[i])}${KHL[i] ? '<br>' + esc(KHL[i]) : ''}</div></div>
+      <button class="ib" data-up="${k}" aria-label="Up" ${k === 0 ? 'disabled' : ''}>↑</button><button class="ib" data-dn="${k}" aria-label="Down" ${k === l.length - 1 ? 'disabled' : ''}>↓</button><button class="ib" data-rm="${k}" aria-label="Remove">✕</button></div>`; }).join('');
+  out.innerHTML = `<h2 class="vt">${t('plTitle')}</h2>
+    <p class="small muted" style="margin:0 2px 10px">${t('plHelp')}</p>
+    <input class="in" id="plRef" placeholder="${t('plRef')}" value="${esc(ref)}" style="margin-bottom:10px">
+    ${l.length ? `<div class="pl">${items}</div>` : `<div class="empty card">${t('plEmpty')}</div>`}
+    <div class="btns" style="margin-top:12px">
+      <button class="btn p" id="plCopy" ${l.length ? '' : 'disabled'}>⧉ ${t('copyAll')}</button>
+      <button class="btn" id="plCopyC" ${l.length ? '' : 'disabled'}>⧉ ${t('copyCodes')}</button>
+      <button class="btn" id="plPrint" ${l.length ? '' : 'disabled'}>🖨 ${t('print')}</button>
+      <button class="btn" id="plXls" ${l.length ? '' : 'disabled'}>⬇ ${t('excel')}</button>
+      <button class="btn r" id="plClr" ${l.length ? '' : 'disabled'}>${t('clear')}</button>
+    </div>
+    <div class="tools" style="margin-top:14px"><button class="tool" data-go="check"><span class="ti">✔</span><span><b>${t('ckTitle')}</b><span>${t('ckSub')}</span></span></button></div>
+    ${fav.length ? `<div class="sec">${t('favs')}</div><div class="list">${fav.map(i => rowHTML(i)).join('')}</div>` : ''}
+    ${creditHTML()}`;
+  out.querySelectorAll('[data-go]').forEach(b => b.onclick = () => show(b.dataset.go));
+  const ed = fn => { const a = store.get('list', []); fn(a); store.set('list', a); LISTSET = null; updCount(); renderList(); };
+  out.querySelectorAll('[data-up]').forEach(b => b.onclick = () => ed(a => { const k = +b.dataset.up; [a[k - 1], a[k]] = [a[k], a[k - 1]]; }));
+  out.querySelectorAll('[data-dn]').forEach(b => b.onclick = () => ed(a => { const k = +b.dataset.dn; [a[k + 1], a[k]] = [a[k], a[k + 1]]; }));
+  out.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => ed(a => a.splice(+b.dataset.rm, 1)));
+  out.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openDetail(+b.dataset.open));
+  $('#plRef').oninput = e => store.set('ref', e.target.value);
+  $('#plCopy').onclick = () => copyText(listText());
+  $('#plCopyC').onclick = () => copyText(store.get('list', []).map(x => x.c).join('; '));
+  $('#plPrint').onclick = printList;
+  $('#plXls').onclick = () => { const ref = store.get('ref', ''); xlsx('KCPH_ICD10_patient_codes', 'Patient ICD-10 codes' + (ref ? ' – ' + ref : ''), ['No.', 'Role', 'Code', 'Diagnosis (English)', 'Diagnosis (Khmer)', 'KCPH risk'],
+    store.get('list', []).map((x, k) => { const i = IDX.get(x.c); const mr = maxRisk(i); return [k + 1, k === 0 ? 'Main' : 'Other', x.c, EN[i], KHL[i], mr ? (mr.hd ? 'up to ' : '') + RISK[mr.r].en : '']; }), [6, 8, 11, 60, 40, 20]); };
+  $('#plClr').onclick = () => { if (!clearArm) { clearArm = true; $('#plClr').textContent = t('sure'); setTimeout(() => { clearArm = false; }, 3000); return; } clearArm = false; store.set('list', []); store.set('ref', ''); LISTSET = null; updCount(); renderList(); };
+  bindRows(out);
+}
+function listText() {
+  const ref = store.get('ref', '');
+  return (ref ? ref + '\n' : '') + store.get('list', []).map((x, k) => { const i = IDX.get(x.c); return `${k + 1}. ${x.c} – ${EN[i]}${KHL[i] ? ' (' + KHL[i] + ')' : ''}${k === 0 ? ' [Main]' : ''}`; }).join('\n');
+}
+function printHeader() {
+  return `<div class="ph"><img src="${LOGO}" alt=""><div class="h1">${HOSP_KH}</div><div class="h2">${HOSP_EN}</div></div>`;
+}
+function printList() {
+  const ref = store.get('ref', ''), d = new Date();
+  const kh = S.lang === 'kh';
+  const H = kh ? ['ល.រ', 'កូដ', 'រោគវិនិច្ឆ័យ (អង់គ្លេស)', 'រោគវិនិច្ឆ័យ (ខ្មែរ)', 'ហានិភ័យ KCPH'] : ['#', 'Code', 'Diagnosis (English)', 'Diagnosis (Khmer)', 'KCPH risk'];
+  $('#print').innerHTML = printHeader() + `<h3 style="text-align:center;margin:6px 0 10px">ICD-10 · ${kh ? 'បញ្ជីកូដអ្នកជំងឺ' : 'Patient code list'}</h3>
+    <p>${ref ? '<b>' + esc(t('plRef')) + ':</b> ' + esc(ref) + ' &nbsp; ' : ''}<b>${kh ? 'កាលបរិច្ឆេទ' : 'Date'}:</b> ${d.toLocaleDateString('en-GB')}</p>
+    <table class="pt"><thead><tr>${H.map((h, k) => `<th style="width:${[9, 13, 38, 26, 14][k]}%">${h}</th>`).join('')}</tr></thead><tbody>
+    ${store.get('list', []).map((x, k) => { const i = IDX.get(x.c); const mr = maxRisk(i); return `<tr><td class="nw">${k + 1}${k === 0 ? (kh ? ' (ចម្បង)' : ' (Main)') : ''}</td><td class="nw"><b>${esc(x.c)}</b></td><td>${esc(EN[i])}</td><td>${esc(KHL[i])}</td><td>${mr ? esc((mr.hd ? (kh ? 'រហូតដល់ ' : 'up to ') : '') + L(RISK[mr.r])) : ''}</td></tr>`; }).join('')}</tbody></table>
+    <div class="pf">KCPH ICD-10 Finder · Developed by ${AUTHOR_EN}, ${AUTHOR_ROLE_EN} · Printed ${d.toLocaleString('en-GB')}</div>`;
+  countUse('print'); window.print();
+}
+
+/* HELP */
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
+function renderHelp() {
+  const out = $('#hpOut'); const kh = S.lang === 'kh';
+  const steps = kh ? [
+    'វាយកូដ (ឧ. J18) ឬឈ្មោះជំងឺជាភាសាខ្មែរ ឬអង់គ្លេស (ឧ. រលាកសួត, pneumonia) ក្នុងប្រអប់ស្វែងរក។ អក្សរកាត់ក៏ប្រើបាន (HTN, COPD, PPH)។',
+    'ចុចលើកូដ ដើម្បីមើលព័ត៌មានលម្អិត។ ប្រើតែកូដដែលមានសញ្ញា ✓ ប្រើបាន។ បើជាកូដក្បាលក្រុម សូមជ្រើសកូដលម្អិតខាងក្រោម។',
+    'មើលពណ៌ហានិភ័យ KCPH៖ ក្រហម = ធ្វើភ្លាម, លឿង = ផែនការគ្រូពេទ្យថ្ងៃនេះ, បៃតង = ថែទាំធម្មតា។',
+    'ចុច «បន្ថែមក្នុងបញ្ជីអ្នកជំងឺ» ហើយទៅផ្ទាំង «បញ្ជីខ្ញុំ» ដើម្បីរៀបលំដាប់ (ចម្បងមុន) ចម្លង បោះពុម្ព ឬទាញយក Excel។',
+    'ផ្ទាំង «សេវា» មានបញ្ជីរហ័សតាមសេវា៖ មាតា និងទារក, ជំងឺមិនឆ្លង, វេជ្ជសាស្ត្រផ្ទៃក្នុង, វះកាត់, សុខភាពផ្លូវចិត្ត។',
+    'ឃើញកូដខ្វះ ឬឈ្មោះខុស? ចុច «រាយការណ៍បញ្ហា»។'
+  ] : [
+    'Type a code (e.g. J18) or a diagnosis in English or Khmer (e.g. pneumonia, រលាកសួត). Abbreviations work too (HTN, COPD, PPH).',
+    'Tap a code to see details. Record only codes marked ✓ Codable. If it is a heading, choose a more specific code below it.',
+    'Check the KCPH risk colour: RED = act now, YELLOW = doctor’s plan today, GREEN = routine care.',
+    'Tap “Add to patient list”, then open “My list” to order the codes (main diagnosis first), copy, print or download Excel.',
+    'The “Services” tab has quick lists for Maternal & Newborn, NCD, Internal Medicine, Surgery and Mental Health.',
+    'Found a missing code or a wrong name? Tap “Report a problem”.'
+  ];
+  const tips = kh ? [
+    'ដាក់រោគវិនិច្ឆ័យចម្បង (មូលហេតុនៃការមក ឬសម្រាកពេទ្យ) ជាកូដទីមួយ។',
+    'ប្តូរកូដរោគសញ្ញា (R) ទៅជារោគវិនិច្ឆ័យបញ្ជាក់ ពេលមានលទ្ធផល (ឧ. R50.9 → B50.9)។',
+    'របួស និងការពុល៖ កូដរបួស/ពុល + កូដមូលហេតុខាងក្រៅ (V–Y)។',
+    'កូដក្នុងស្រុក KCPH (ឧ. A91 គ្រុនឈាមគ្មានស្ហុក, Z36.4.x ពិនិត្យផ្ទៃពោះលើកទី) សូមពិនិត្យជាមួយ HIS មុនប្រើនៅមូលដ្ឋានផ្សេង។'
+  ] : [
+    'Put the main diagnosis (the reason for the visit or admission) first.',
+    'Replace symptom (R) codes with the confirmed diagnosis when results are back (e.g. R50.9 → B50.9).',
+    'Injury and poisoning: the injury/poisoning code + an external cause code (V–Y).',
+    'KCPH local codes (e.g. A91 dengue without shock, Z36.4.x ANC visit number): check with your HIS before using them at another facility.'
+  ];
+  const outbox = store.get('outbox', []);
+  out.innerHTML = `
+    <div class="card pad hero"><img src="${LOGO}" alt="KCPH logo"><div><b style="font-size:18px;color:var(--blue-d)">${t('appName')}</b><div class="small muted">${kh ? HOSP_KH : HOSP_EN}</div><div class="small muted">${C.length.toLocaleString()} ${t('codes')} · ${t('offlineOk')}</div></div></div>
+    <div class="sec">📘 ${kh ? 'សៀវភៅណែនាំការប្រើកូដ ICD-10' : 'ICD-10 Application Guide'}</div>
+    <div class="tools"><a class="tool" href="guide-en.html"><span class="ti">EN</span><span><b>${t('guideEn')}</b><span>${t('guideSub')}</span></span></a><a class="tool" href="guide-kh.html"><span class="ti">ខ្មែរ</span><span><b>${t('guideKh')}</b><span>${t('guideSub')}</span></span></a></div>
+    <div class="sec">${t('howTo')}</div><div class="card pad"><ol class="steps">${steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol></div>
+    <div class="sec">${t('legend')}</div>${legendHTML()}
+    <div class="sec">${t('tips')}</div><div class="card pad"><ul class="steps">${tips.map(s => `<li>${esc(s)}</li>`).join('')}</ul></div>
+    <div class="sec">${t('settings')}</div>
+    <div class="card pad">
+      <label class="f">${t('language')}</label>
+      <div class="seg" style="margin:0"><button data-lg="kh" class="${S.lang === 'kh' ? 'on' : ''}">ខ្មែរ</button><button data-lg="en" class="${S.lang === 'en' ? 'on' : ''}">English</button></div>
+      <label class="f" style="display:flex;gap:10px;align-items:center;font-weight:500"><input type="checkbox" id="setFr" ${S.fr ? 'checked' : ''} style="width:20px;height:20px"> ${t('showFr')}</label>
+      <label class="f" style="display:flex;gap:10px;align-items:center;font-weight:500"><input type="checkbox" id="setLeaf" ${S.leafOnly ? 'checked' : ''} style="width:20px;height:20px"> ${t('fLeaf')} (${t('tSearch')})</label>
+      <label class="f">${t('dept')}</label><select class="in" id="setDept">${['', ...SVC_ORDER].map(k => `<option value="${k}" ${S.dept === k ? 'selected' : ''}>${esc(k ? L(SVC[k]) : t('deptAll'))}</option>`).join('')}</select>
+      <label class="f">${t('myFac')}</label><input class="in" id="setFac" value="${esc(S.facility)}" placeholder="${kh ? 'ឧ. មន្ទីរពេទ្យបង្អែក…' : 'e.g. Referral hospital…'}">
+      <label class="f">${t('myProv')}</label><select class="in" id="setProv"><option value="">—</option>${PROV.map(p => { const [e, k] = p.split('|'); return `<option value="${esc(e)}" ${S.province === e ? 'selected' : ''}>${esc(kh ? k + ' / ' + e : e + ' / ' + k)}</option>`; }).join('')}</select>
+    </div>
+    <div class="sec">${t('share')}</div>
+    <div class="card pad">
+      <div id="qr"></div>
+      <p class="small muted mono" style="text-align:center;word-break:break-all;margin:4px 0 10px">${esc(location.href.split('#')[0].split('?')[0])}</p>
+      <div class="btns"><button class="btn p" id="hShare">↗ ${t('share')}</button><button class="btn" id="hInst">⤓ ${t('install')}</button></div>
+    </div>
+    <div class="sec">${t('general')}</div>
+    <div class="card pad"><div class="btns"><button class="btn" id="hFb">⚑ ${t('fbTitle')}</button><button class="btn" id="hRep">📊 ${kh ? 'របាយការណ៍ប្រើប្រាស់ប្រចាំខែ' : 'Monthly usage report'}</button>${outbox.length ? `<button class="btn g" id="hSend">${t('sendNow')} (${outbox.length} ${t('pending')})</button>` : ''}</div></div>
+    <div class="sec">${t('about')}</div>
+    <div class="card pad"><dl class="kv">
+      <dt>${t('dev')}</dt><dd><b>${AUTHOR_EN}</b><br>${esc(kh ? AUTHOR_ROLE_KH : AUTHOR_ROLE_EN)}</dd>
+      <dt>${kh ? 'ប្រភពកូដ' : 'Code source'}</dt><dd>${esc(META.src || '')}</dd>
+      <dt>${kh ? 'ពណ៌ហានិភ័យ' : 'Risk colours'}</dt><dd>${kh ? 'សៀវភៅកូដសេវា KCPH (វិច្ឆិកា ២០២៦)' : 'KCPH service workbooks (Nov 2026)'}</dd>
+      <dt>${kh ? 'កំណែ' : 'Version'}</dt><dd>${APP_VERSION}</dd>
+    </dl>
+    <p class="small muted" style="margin:10px 0 0">${kh ? 'ឧបករណ៍នេះជាជំនួយ។ សូមអនុវត្តតាមគោលការណ៍ក្រសួងសុខាភិបាល និង HIS។ មិនរក្សាទុកទិន្នន័យអ្នកជំងឺលើម៉ាស៊ីនមេទេ។' : 'This tool is a coding aid. Follow Ministry of Health and HIS rules. No patient data is sent to any server.'}</p></div>
+    ${creditHTML()}`;
+  out.querySelectorAll('[data-lg]').forEach(b => b.onclick = () => setLang(b.dataset.lg));
+  $('#setFr').onchange = async e => { S.fr = e.target.checked; saveS(); if (S.fr) await loadFr(); };
+  $('#setLeaf').onchange = e => { S.leafOnly = e.target.checked; F.leaf = S.leafOnly; saveS(); };
+  $('#setFac').onchange = e => { S.facility = e.target.value.trim(); saveS(); };
+  $('#setProv').onchange = e => { S.province = e.target.value; saveS(); };
+  $('#setDept').onchange = e => { S.dept = e.target.value; saveS(); };
+  $('#hFb').onclick = () => openFeedback('');
+  $('#hRep').onclick = () => show('report');
+  const hs = $('#hSend'); if (hs) hs.onclick = () => flushOutbox(true);
+  $('#hShare').onclick = async () => { const url = location.href.split('#')[0].split('?')[0]; const text = 'KCPH ICD-10 Finder – ' + (kh ? 'ស្វែងរកកូដ ICD-10 ជាភាសាខ្មែរ និងអង់គ្លេស' : 'bilingual ICD-10 code finder') + ' (Dr. Yeap Kong, KCPH)';
+    if (navigator.share) { try { await navigator.share({ title: 'KCPH ICD-10 Finder', text, url }); } catch (e) {} } else copyText(text + '\n' + url); };
+  $('#hInst').onclick = async () => { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; } else toast(kh ? 'ប្រើម៉ឺនុយកម្មវិធីរុករក › «Add to Home screen»' : 'Use the browser menu › “Add to Home screen”'); };
+  try { if (window.QRCode) new QRCode($('#qr'), { text: location.href.split('#')[0].split('?')[0], width: 180, height: 180, colorDark: '#1E2A6E', colorLight: '#ffffff' }); } catch (e) {}
+}
+
+/* FEEDBACK + backend (GET + JSONP; offline outbox) */
+function openFeedback(code) {
+  const ov = sheet(`<div class="grab"></div><div class="sh-top"><b style="font-size:18px">${t('fbTitle')}</b><button class="x" id="fX">×</button></div>
+    <label class="f">${t('fbType')}</label><select class="in" id="fT">${T.fbT[S.lang].map((x, k) => `<option value="${k}">${esc(x)}</option>`).join('')}</select>
+    <label class="f">${t('fbCode')}</label><input class="in mono" id="fC" value="${esc(code)}">
+    <label class="f">${t('fbMsg')}</label><textarea class="in" id="fM"></textarea>
+    <label class="f">${t('fbFac')}</label><input class="in" id="fF" value="${esc(S.facility)}">
+    <label class="f">${t('fbName')}</label><input class="in" id="fN" value="${esc(store.get('fbname', ''))}">
+    <label class="f">${t('fbContact')}</label><input class="in" id="fP" value="${esc(store.get('fbcontact', ''))}">
+    <div class="acts"><button class="btn g" id="fCan">${t('cancel')}</button><button class="btn p" id="fSend">${t('send')}</button></div>`);
+  if (code) ov.querySelector('#fT').value = '1';
+  ov.querySelector('#fX').onclick = ov.querySelector('#fCan').onclick = () => closeSheet();
+  ov.querySelector('#fSend').onclick = () => {
+    const msg = ov.querySelector('#fM').value.trim(); if (!msg) { toast(t('needMsg')); return; }
+    store.set('fbname', ov.querySelector('#fN').value.trim()); store.set('fbcontact', ov.querySelector('#fP').value.trim());
+    const k = +ov.querySelector('#fT').value;
+    queue({ action: 'feedback', id: uid(), type: T.fbT.en[k], code: ov.querySelector('#fC').value.trim(), message: msg,
+      facility: ov.querySelector('#fF').value.trim(), province: S.province, name: ov.querySelector('#fN').value.trim(), contact: ov.querySelector('#fP').value.trim(),
+      lang: S.lang, app_version: APP_VERSION, sent_at: new Date().toISOString() });
+    closeSheet(); toast(navigator.onLine && GAS_URL ? t('sentOk') : t('queued')); countUse('feedback');
+  };
+}
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+function queue(item) { const o = store.get('outbox', []).filter(x => x.id !== item.id); o.push(item); store.set('outbox', o.slice(-200)); flushOutbox(); }
+function jsonp(params) {
+  return new Promise((res, rej) => {
+    const cb = '__kcph_cb_' + uid(); const s = document.createElement('script');
+    const tm = setTimeout(() => { cleanup(); rej(new Error('timeout')); }, 15000);
+    function cleanup() { clearTimeout(tm); delete window[cb]; s.remove(); }
+    window[cb] = d => { cleanup(); res(d); };
+    s.onerror = () => { cleanup(); rej(new Error('network')); };
+    s.src = GAS_URL + '?' + new URLSearchParams(Object.assign({}, params, { callback: cb })).toString();
+    document.body.appendChild(s);
+  });
+}
+let flushing = false;
+async function flushOutbox(manual) {
+  if (!GAS_URL) { if (manual) toast(S.lang === 'kh' ? 'មិនទាន់ភ្ជាប់ម៉ាស៊ីនមេ (GAS_URL)' : 'Backend not configured yet (GAS_URL)'); return; }
+  if (flushing || !navigator.onLine) return; flushing = true;
+  try {
+    let o = store.get('outbox', []);
+    while (o.length) {
+      const it = o[0];
+      try { const r = await jsonp(it); if (!r || !r.ok) break; } catch (e) { break; }
+      o = store.get('outbox', []).filter(x => x.id !== it.id); store.set('outbox', o);
+    }
+    if (manual) toast(o.length ? t('queued') : t('sentOk'));
+  } finally { flushing = false; }
+}
+/* anonymous usage data: one row per device per day, updated during the day (no patient data, no search text) */
+const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const blankUse = () => ({ d: today(), o: 0, k: 0, s: 0, v: 0, a: 0, x: 0, p: 0, f: 0, codes: {} });
+function countUse(kind, code) {
+  let u = store.get('use', null); if (!u || !u.d) u = blankUse();
+  if (u.d !== today()) { sendUse(u); u = blankUse(); }
+  const k = { open: 'o', click: 'k', search: 's', view: 'v', add: 'a', export: 'x', print: 'p', feedback: 'f' }[kind];
+  if (k) u[k] = (u[k] || 0) + 1;
+  if (code && (kind === 'view' || kind === 'add')) { u.codes = u.codes || {}; u.codes[code] = (u.codes[code] || 0) + 1; }
+  store.set('use', u); maybeSend(false);
+}
+let lastSend = 0;
+function maybeSend(force) { const now = Date.now(); if (!force && now - lastSend < 10 * 60 * 1000) return; lastSend = now; const u = store.get('use', null); if (u) sendUse(u); }
+function sendUse(u) {
+  if (!u || !(u.o || u.k || u.s || u.v || u.a || u.x || u.p || u.f)) return;
+  let dev = store.get('dev', ''); if (!dev) { dev = uid(); store.set('dev', dev); }
+  const top = Object.entries(u.codes || {}).sort((a, b) => b[1] - a[1]).slice(0, 40).map(([c, n]) => c + ':' + n).join(',');
+  queue({ action: 'usage', id: dev + '_' + u.d, day: u.d, device: dev, opens: u.o || 0, clicks: u.k || 0, searches: u.s || 0, views: u.v || 0, list_adds: u.a || 0,
+    exports: u.x || 0, prints: u.p || 0, feedback: u.f || 0, codes: top, facility: S.facility, province: S.province, lang: S.lang,
+    platform: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'mobile' : 'computer',
+    installed: matchMedia('(display-mode: standalone)').matches ? 'yes' : 'no', app_version: APP_VERSION, updated_at: new Date().toISOString() });
+}
+// every tap/click on a button, code row, link or setting counts as one click
+document.addEventListener('click', e => { if (e.target.closest && e.target.closest('button,a,select,input[type=checkbox],input[type=month],.row')) countUse('click'); }, true);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') maybeSend(true); });
+
+/* ---------- monthly usage report (admin) ---------- */
+let rep = null, rpBusy = false;
+const MONTHS_KH = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+function monthName(m, lang) { const [y, mm] = m.split('-').map(Number); return lang === 'kh' ? 'ខែ' + MONTHS_KH[mm - 1] + ' ឆ្នាំ ' + y : new Date(y, mm - 1, 1).toLocaleString('en-GB', { month: 'long', year: 'numeric' }); }
+function provName(n) { const p = PROV.find(x => x.split('|')[0] === n); return p ? (S.lang === 'kh' ? p.split('|')[1] : p.split('|')[0]) : n; }
+function codeTitle(c) { const i = IDX.get(c); return i === undefined ? '' : (S.lang === 'kh' && KHL[i] ? KHL[i] : EN[i]); }
+function renderReport() {
+  const kh = S.lang === 'kh', out = $('#rpOut');
+  const month = store.get('rpMonth', today().slice(0, 7)), pin = store.get('rpPin', '') || (window.__rpPin || '');
+  out.innerHTML = `<div class="crumbs"><button id="rpBack">‹ ${t('tHelp')}</button></div>
+    <h2 class="vt">${kh ? 'របាយការណ៍ប្រើប្រាស់ប្រចាំខែ' : 'Monthly usage report'}</h2>
+    <p class="small muted" style="margin:0 2px 10px">${kh ? 'ទិន្នន័យអនាមិក ពីឧបករណ៍នីមួយៗ ក្នុងមួយថ្ងៃ (គ្មានទិន្នន័យអ្នកជំងឺ)។ សម្រាប់អ្នកគ្រប់គ្រងប៉ុណ្ណោះ។' : 'Anonymous data, one row per device per day (no patient data). For administrators only.'}</p>
+    <div class="card pad">
+      <label class="f">${kh ? 'ខែ' : 'Month'}</label><input class="in" type="month" id="rpM" value="${esc(month)}">
+      <label class="f">${kh ? 'លេខ PIN អ្នកគ្រប់គ្រង' : 'Admin PIN'}</label><input class="in" type="password" id="rpP" value="${esc(pin)}" autocomplete="off">
+      <label class="f" style="display:flex;gap:10px;align-items:center;font-weight:500"><input type="checkbox" id="rpR" ${store.get('rpPin', '') ? 'checked' : ''} style="width:20px;height:20px"> ${kh ? 'ចងចាំ PIN លើឧបករណ៍នេះ' : 'Remember the PIN on this device'}</label>
+      <div class="btns" style="margin-top:12px"><button class="btn p" id="rpLoad" ${rpBusy ? 'disabled' : ''}>${rpBusy ? '…' : (kh ? 'បង្ហាញរបាយការណ៍' : 'Show report')}</button></div>
+    </div>
+    ${rep ? reportBody(rep) : ''}`;
+  $('#rpBack').onclick = () => show('help');
+  $('#rpLoad').onclick = loadReport;
+  if (rep) { $('#rpXls').onclick = () => reportExcel(rep); $('#rpPrint').onclick = () => reportPrint(rep); }
+}
+async function loadReport() {
+  const m = $('#rpM').value, pin = $('#rpP').value.trim(), kh = S.lang === 'kh';
+  if (!/^\d{4}-\d{2}$/.test(m)) { toast(kh ? 'សូមជ្រើសខែ' : 'Please choose a month'); return; }
+  if (!pin) { toast(kh ? 'សូមបញ្ចូល PIN' : 'Please enter the PIN'); return; }
+  if (!GAS_URL) { toast('Backend not configured (GAS_URL)'); return; }
+  if (!navigator.onLine) { toast(kh ? 'ត្រូវការអ៊ីនធឺណិត' : 'Internet connection needed'); return; }
+  store.set('rpMonth', m); window.__rpPin = pin; store.set('rpPin', $('#rpR').checked ? pin : '');
+  maybeSend(true); await flushOutbox();
+  rpBusy = true; renderReport();
+  try {
+    const r = await jsonp({ action: 'report', month: m, pin });
+    if (!r || !r.ok) { toast((r && r.error) || 'Error'); rep = null; } else rep = r;
+  } catch (e) { toast(kh ? 'មិនអាចភ្ជាប់ម៉ាស៊ីនមេបាន' : 'Could not reach the backend'); }
+  rpBusy = false; renderReport();
+}
+function statCards(r) {
+  const kh = S.lang === 'kh', T = r.totals, n = x => (x || 0).toLocaleString();
+  const c = [[T.clicks, kh ? 'ការចុច (clicks)' : 'Clicks / taps'], [T.opens, kh ? 'ការបើកកម្មវិធី' : 'App opens'], [T.devices, kh ? 'ឧបករណ៍ប្រើប្រាស់' : 'Active devices'], [T.device_days, kh ? 'ថ្ងៃប្រើ (ឧបករណ៍×ថ្ងៃ)' : 'Device-days of use'],
+    [T.searches, kh ? 'ការស្វែងរក' : 'Searches'], [T.views, kh ? 'កូដបានមើល' : 'Codes viewed'], [T.list_adds, kh ? 'កូដបន្ថែមក្នុងបញ្ជី' : 'Codes added to lists'],
+    [(T.exports || 0) + (T.prints || 0), kh ? 'Excel + បោះពុម្ព' : 'Excel + prints'], [T.provinces, kh ? 'ខេត្ត' : 'Provinces'], [T.facilities, kh ? 'មូលដ្ឋានសុខាភិបាល' : 'Facilities'],
+    [T.installed_devices, kh ? 'ដំឡើងជាកម្មវិធី' : 'Installed as app'], [(r.feedback || []).length, kh ? 'មតិ/រាយការណ៍' : 'Feedback received']];
+  return `<div class="stats">${c.map(x => `<div class="st"><b>${n(x[0])}</b><span>${esc(x[1])}</span></div>`).join('')}</div>`;
+}
+function dailyFull(r) {
+  const [y, m] = r.month.split('-').map(Number), nd = new Date(y, m, 0).getDate(), map = {};
+  (r.daily || []).forEach(d => map[d.day] = d);
+  return [...Array(nd)].map((_, k) => { const key = r.month + '-' + String(k + 1).padStart(2, '0'); return map[key] || { day: key, devices: 0, opens: 0, clicks: 0, searches: 0, views: 0 }; });
+}
+function chartSVG(r) {
+  const vals = dailyFull(r), n = vals.length, bw = 22, H = 170, top = 10, base = 140;
+  const mx = Math.max(1, ...vals.map(v => v.clicks || 0));
+  let g = '';
+  vals.forEach((v, k) => {
+    const x = k * bw + 4, hc = (v.clicks || 0) / mx * (base - top);
+    g += `<rect x="${x}" y="${base - hc}" width="${bw - 8}" height="${hc}" fill="#2B3990"><title>${v.day}: ${v.clicks || 0} clicks, ${v.devices} devices</title></rect>`;
+    if (v.clicks) g += `<text x="${x + (bw - 8) / 2}" y="${base - hc - 3}" font-size="9" text-anchor="middle" fill="#4A5168">${v.clicks}</text>`;
+    if (k === 0 || (k + 1) % 5 === 0 || k === n - 1) g += `<text x="${x + (bw - 8) / 2}" y="${base + 16}" font-size="11" text-anchor="middle" fill="#4A5168">${k + 1}</text>`;
+  });
+  g += `<line x1="0" y1="${base}" x2="${n * bw}" y2="${base}" stroke="#DDE1EC"/>`;
+  return `<svg viewBox="0 0 ${n * bw} ${H}" width="100%" role="img" aria-label="Clicks per day">${g}</svg>`;
+}
+function tbl(head, rows, numCols) {
+  numCols = numCols || [];
+  return `<div class="tbw"><table class="tb"><tr>${head.map((h, k) => `<th class="${numCols.includes(k) ? 'n' : ''}">${esc(h)}</th>`).join('')}</tr>${rows.map(r => `<tr>${r.map((c, k) => `<td class="${numCols.includes(k) ? 'n' : ''}">${esc(typeof c === 'number' ? c.toLocaleString() : c)}</td>`).join('')}</tr>`).join('')}</table></div>`;
+}
+function reportRows(r) {
+  const kh = S.lang === 'kh';
+  return {
+    prov: (r.provinces || []).map(p => [provName(p.name), p.devices, p.days, p.clicks || 0, p.searches, p.views]),
+    fac: (r.facilities || []).map(f => [f.name, provName(f.province), f.devices, f.days, f.clicks || 0, f.searches, f.views]),
+    codes: (r.codes || []).map((c, k) => [k + 1, c[0], codeTitle(c[0]), c[1]]),
+    fb: (r.feedback || []).map(f => [f.received, f.type, f.code, f.message, f.facility, provName(f.province), f.name, f.contact]),
+    daily: dailyFull(r).map(d => [d.day, d.devices, d.opens, d.clicks || 0, d.searches, d.views]),
+    monthly: (r.monthly || []).map(m => [monthName(m.month, S.lang), m.devices, m.opens, m.clicks || 0, m.searches, m.views]),
+    H: {
+      prov: kh ? ['ខេត្ត', 'ឧបករណ៍', 'ថ្ងៃប្រើ', 'ចុច', 'ស្វែងរក', 'មើលកូដ'] : ['Province', 'Devices', 'Device-days', 'Clicks', 'Searches', 'Codes viewed'],
+      fac: kh ? ['មូលដ្ឋានសុខាភិបាល', 'ខេត្ត', 'ឧបករណ៍', 'ថ្ងៃប្រើ', 'ចុច', 'ស្វែងរក', 'មើលកូដ'] : ['Facility', 'Province', 'Devices', 'Device-days', 'Clicks', 'Searches', 'Codes viewed'],
+      codes: kh ? ['#', 'កូដ', 'ឈ្មោះជំងឺ', 'ចំនួន'] : ['#', 'Code', 'Diagnosis', 'Times viewed/added'],
+      fb: kh ? ['ថ្ងៃ', 'ប្រភេទ', 'កូដ', 'សេចក្តីលម្អិត', 'មូលដ្ឋាន', 'ខេត្ត', 'ឈ្មោះ', 'ទំនាក់ទំនង'] : ['Date', 'Type', 'Code', 'Details', 'Facility', 'Province', 'Name', 'Contact'],
+      daily: kh ? ['ថ្ងៃ', 'ឧបករណ៍', 'បើក', 'ចុច', 'ស្វែងរក', 'មើលកូដ'] : ['Date', 'Devices', 'Opens', 'Clicks', 'Searches', 'Codes viewed'],
+      monthly: kh ? ['ខែ', 'ឧបករណ៍', 'បើក', 'ចុច', 'ស្វែងរក', 'មើលកូដ'] : ['Month', 'Devices', 'Opens', 'Clicks', 'Searches', 'Codes viewed']
+    }
+  };
+}
+function reportBody(r) {
+  const kh = S.lang === 'kh', x = reportRows(r), pf = r.platform || {};
+  return `
+    <div class="sec">${esc(monthName(r.month, S.lang))}</div>
+    <div class="btns" style="margin-bottom:12px"><button class="btn p" id="rpXls">⬇ Excel</button><button class="btn" id="rpPrint">🖨 ${t('print')}</button></div>
+    ${statCards(r)}
+    <p class="small muted" style="margin:8px 2px">${kh ? 'ទូរស័ព្ទ' : 'Phones'}: ${(pf.mobile || 0).toLocaleString()} · ${kh ? 'កុំព្យូទ័រ' : 'Computers'}: ${(pf.computer || 0).toLocaleString()} · ${kh ? 'ភាសាខ្មែរ' : 'Khmer'}: ${((r.lang || {}).kh || 0).toLocaleString()} · ${kh ? 'អង់គ្លេស' : 'English'}: ${((r.lang || {}).en || 0).toLocaleString()}</p>
+    <div class="sec">${kh ? 'ការចុចប្រចាំថ្ងៃ' : 'Clicks per day'}</div>
+    <div class="chart">${chartSVG(r)}<div style="margin-top:6px"><span class="key"><i style="background:#2B3990"></i>${kh ? 'ការចុចក្នុងមួយថ្ងៃ' : 'Clicks per day'}</span></div></div>
+    <div class="sec">${kh ? 'ប្រៀបធៀបតាមខែ' : 'Month by month'}</div>${x.monthly.length ? tbl(x.H.monthly, x.monthly.slice().reverse(), [1, 2, 3, 4, 5]) : `<div class="empty card">—</div>`}
+    <div class="sec">${kh ? 'តាមខេត្ត' : 'By province'}</div>${x.prov.length ? tbl(x.H.prov, x.prov, [1, 2, 3, 4, 5]) : `<div class="empty card">—</div>`}
+    <div class="sec">${kh ? 'តាមមូលដ្ឋានសុខាភិបាល' : 'By health facility'}</div>${x.fac.length ? tbl(x.H.fac, x.fac.slice(0, 100), [2, 3, 4, 5, 6]) : `<div class="empty card">—</div>`}
+    <div class="sec">${kh ? 'កូដដែលប្រើច្រើនបំផុត' : 'Most-used codes'}</div>${x.codes.length ? tbl(x.H.codes, x.codes.slice(0, 30), [0, 3]) : `<div class="empty card">—</div>`}
+    <div class="sec">${kh ? 'មតិ និងរាយការណ៍បញ្ហា' : 'Feedback and problem reports'}</div>${x.fb.length ? tbl(x.H.fb, x.fb) : `<div class="empty card">${kh ? 'គ្មាន' : 'None this month'}</div>`}
+    <p class="small muted" style="margin-top:10px">${kh ? 'បង្កើតនៅ' : 'Generated'} ${new Date(r.generated).toLocaleString('en-GB')}</p>`;
+}
+function reportExcel(r) {
+  const x = reportRows(r), T = r.totals, mn = monthName(r.month, 'en'), ttl = 'KCPH ICD-10 Finder – Monthly usage report – ' + mn;
+  const sum = [['Clicks / taps', T.clicks || 0], ['App opens', T.opens], ['Active devices', T.devices], ['Device-days of use', T.device_days], ['App opens', T.opens], ['Searches', T.searches], ['Codes viewed', T.views],
+    ['Codes added to patient lists', T.list_adds], ['Excel exports', T.exports], ['Prints / PDF', T.prints], ['Feedback sent from app', T.feedback_sent],
+    ['Feedback received', (r.feedback || []).length], ['Provinces using the tool', T.provinces], ['Facilities using the tool', T.facilities], ['Devices with app installed', T.installed_devices],
+    ['Phones', (r.platform || {}).mobile || 0], ['Computers', (r.platform || {}).computer || 0], ['Khmer interface (devices)', (r.lang || {}).kh || 0], ['English interface (devices)', (r.lang || {}).en || 0]];
+  const en = { prov: ['Province', 'Devices', 'Device-days', 'Clicks', 'Searches', 'Codes viewed'], fac: ['Facility', 'Province', 'Devices', 'Device-days', 'Clicks', 'Searches', 'Codes viewed'], monthly: ['Month', 'Devices', 'Opens', 'Clicks', 'Searches', 'Codes viewed'],
+    codes: ['#', 'Code', 'Diagnosis', 'Times viewed/added'], fb: ['Date', 'Type', 'Code', 'Details', 'Facility', 'Province', 'Name', 'Contact'], daily: ['Date', 'Devices', 'Opens', 'Clicks', 'Searches', 'Codes viewed'] };
+  xlsxBook('KCPH_ICD10_Finder_usage_' + r.month, [
+    { name: 'Summary', title: ttl, head: ['Indicator', 'Value'], rows: sum, widths: [34, 14] },
+    { name: 'Daily', title: ttl + ' – daily use', head: en.daily, rows: x.daily, widths: [12, 10, 10, 10, 10, 14] },
+    { name: 'Month by month', title: 'KCPH ICD-10 Finder – usage by month', head: en.monthly, rows: (r.monthly || []).map(m => [m.month, m.devices, m.opens, m.clicks || 0, m.searches, m.views]), widths: [12, 10, 10, 10, 10, 14] },
+    { name: 'Provinces', title: ttl + ' – by province', head: en.prov, rows: x.prov, widths: [24, 10, 12, 10, 10, 14] },
+    { name: 'Facilities', title: ttl + ' – by facility', head: en.fac, rows: x.fac, widths: [36, 20, 10, 12, 10, 10, 14] },
+    { name: 'Top codes', title: ttl + ' – most-used codes', head: en.codes, rows: (r.codes || []).map((c, k) => { const i = IDX.get(c[0]); return [k + 1, c[0], i === undefined ? '' : EN[i] + (KHL[i] ? ' / ' + KHL[i] : ''), c[1]]; }), widths: [5, 11, 70, 18] },
+    { name: 'Feedback', title: ttl + ' – feedback', head: en.fb, rows: x.fb, widths: [12, 24, 10, 60, 24, 16, 18, 18] }
+  ]);
+}
+function reportPrint(r) {
+  const x = reportRows(r), T = r.totals, kh = S.lang === 'kh';
+  const tb = (cap, h, rows, numCols, cls) => `<table class="pt ${cls || ''}"><caption>${esc(cap)}</caption><thead><tr>${h.map((c, k) => `<th class="${(numCols || []).includes(k) ? 'n' : ''}">${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(rr => `<tr>${rr.map((c, k) => `<td class="${(numCols || []).includes(k) ? 'n' : ''}">${esc(typeof c === 'number' ? c.toLocaleString() : c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  $('#print').innerHTML = printHeader() + `<h3 style="text-align:center;margin:6px 0 2px">${kh ? 'របាយការណ៍ប្រើប្រាស់ឧបករណ៍ស្វែងរកកូដ ICD-10' : 'ICD-10 Finder – monthly usage report'}</h3>
+    <p style="text-align:center;margin:0 0 10px">${esc(monthName(r.month, S.lang))}</p>
+    ${tb(kh ? 'សង្ខេប' : 'Summary', [kh ? 'សូចនាករ' : 'Indicator', kh ? 'ចំនួន' : 'Value'], [
+      [kh ? 'ការចុច (clicks)' : 'Clicks / taps', T.clicks || 0], [kh ? 'ការបើកកម្មវិធី' : 'App opens', T.opens], [kh ? 'ឧបករណ៍ប្រើប្រាស់' : 'Active devices', T.devices], [kh ? 'ថ្ងៃប្រើ (ឧបករណ៍×ថ្ងៃ)' : 'Device-days of use', T.device_days], [kh ? 'ការស្វែងរក' : 'Searches', T.searches],
+      [kh ? 'កូដបានមើល' : 'Codes viewed', T.views], [kh ? 'កូដបន្ថែមក្នុងបញ្ជី' : 'Codes added to patient lists', T.list_adds], [kh ? 'Excel + បោះពុម្ព' : 'Excel exports + prints', (T.exports || 0) + (T.prints || 0)],
+      [kh ? 'ខេត្ត' : 'Provinces', T.provinces], [kh ? 'មូលដ្ឋានសុខាភិបាល' : 'Facilities', T.facilities], [kh ? 'មតិ/រាយការណ៍' : 'Feedback received', (r.feedback || []).length]], [1])}
+    <div class="keep"><h4>${kh ? 'ការចុចប្រចាំថ្ងៃ' : 'Clicks per day'}</h4><div style="border:1px solid #999;padding:6px">${chartSVG(r)}</div></div>
+    ${tb(kh ? 'ប្រៀបធៀបតាមខែ' : 'Month by month', x.H.monthly, x.monthly.slice().reverse(), [1, 2, 3, 4, 5])}
+    ${tb(kh ? 'តាមខេត្ត' : 'By province', x.H.prov, x.prov, [1, 2, 3, 4, 5])}
+    ${tb(kh ? 'តាមមូលដ្ឋានសុខាភិបាល' : 'By health facility', x.H.fac, x.fac.slice(0, 60), [2, 3, 4, 5, 6])}
+    ${tb(kh ? 'កូដដែលប្រើច្រើនបំផុត' : 'Most-used codes', x.H.codes, x.codes.slice(0, 20), [0, 3])}
+    ${x.fb.length ? tb(kh ? 'មតិ និងរាយការណ៍បញ្ហា' : 'Feedback', kh ? ['ថ្ងៃ', 'ប្រភេទ', 'កូដ', 'សេចក្តីលម្អិត', 'មូលដ្ឋាន / ខេត្ត', 'ឈ្មោះ · ទំនាក់ទំនង'] : ['Date', 'Type', 'Code', 'Details', 'Facility / province', 'Name · contact'], x.fb.map(f => [f[0], f[1], f[2], f[3], f[4] + (f[5] ? ' / ' + f[5] : ''), [f[6], f[7]].filter(Boolean).join(' · ')]), [], 'sm').replace(/<th class="">/, '<th class="" style="width:12%">') : ''}
+    <div class="pf">KCPH ICD-10 Finder · Developed by ${AUTHOR_EN}, ${AUTHOR_ROLE_EN} · Generated ${new Date().toLocaleString('en-GB')}</div>`;
+  countUse('print'); window.print();
+}
+
+/* ---------- code checker ---------- */
+let ckRes = null;
+function parseCodes(text) {
+  const out = []; const re = /\b(OT\d{1,2}|[A-Z][0-9][0-9A-Z](?:\.?[0-9A-Z]{1,4})?(?:\.[0-9])?)\b/g; let m;
+  const up = String(text).toUpperCase();
+  while ((m = re.exec(up))) {
+    let raw = m[1], c = raw;
+    if (!c.includes('.') && c.length > 3 && !/^OT/.test(c)) c = c.slice(0, 3) + '.' + c.slice(3);
+    out.push({ raw, c });
+  }
+  return out;
+}
+function checkOne(c) {
+  const i = IDX.get(c);
+  if (i === undefined) {
+    let p = c; let near = -1;
+    while (p.length > 1) { p = p.slice(0, -1).replace(/\.+$/, ''); if (IDX.has(p)) { near = IDX.get(p); break; } }
+    return { st: 'x', i: -1, near };
+  }
+  if (KIDS[i]) return { st: 'h', i };
+  if (FL[i] & 2) return { st: 'l', i };
+  return { st: 'ok', i };
+}
+function renderCheck() {
+  const kh = S.lang === 'kh', out = $('#ckOut');
+  const txt = store.get('cktext', '');
+  let body = '';
+  if (ckRes) {
+    const n = { ok: 0, h: 0, l: 0, x: 0, d: 0 }; ckRes.forEach(r => { n[r.st]++; if (r.dup) n.d++; });
+    const lab = { ok: kh ? '✓ ត្រឹមត្រូវ ប្រើបាន' : '✓ Valid, codable', h: kh ? '⚠ មិនពេញលេញ — ត្រូវការលេខបន្ថែម' : '⚠ Incomplete — needs more digits', l: kh ? 'ⓘ កូដក្នុងស្រុក KCPH' : 'ⓘ KCPH local code', x: kh ? '✗ មិនមានក្នុងបញ្ជីកូដ' : '✗ Not in the code list' };
+    const cls = { ok: 'ok', h: 'w', l: 'l', x: 'x' };
+    body = `<div class="stats" style="margin-top:12px">
+      <div class="st"><b>${ckRes.length}</b><span>${kh ? 'កូដសរុប' : 'Codes checked'}</span></div>
+      <div class="st"><b style="color:var(--lo-x)">${n.ok}</b><span>${lab.ok}</span></div>
+      <div class="st"><b style="color:#5E4500">${n.h}</b><span>${lab.h}</span></div>
+      <div class="st"><b style="color:#8A3C00">${n.l}</b><span>${lab.l}</span></div>
+      <div class="st"><b style="color:var(--hi-x)">${n.x}</b><span>${lab.x}</span></div>
+      <div class="st"><b>${n.d}</b><span>${kh ? 'កូដស្ទួន' : 'Duplicates'}</span></div></div>
+      <div class="btns" style="margin:12px 0"><button class="btn p" id="ckAdd" ${n.ok + n.l ? '' : 'disabled'}>＋ ${kh ? 'បន្ថែមកូដត្រឹមត្រូវក្នុងបញ្ជីអ្នកជំងឺ' : 'Add valid codes to patient list'}</button><button class="btn" id="ckXls">⬇ Excel</button></div>
+      <div class="list">${ckRes.map((r, k) => {
+        const i = r.i, nm = i >= 0 ? (kh && KHL[i] ? KHL[i] : EN[i]) : '';
+        let hint = '';
+        if (r.st === 'h') hint = (kh ? 'ជ្រើសកូដលម្អិតមួយក្នុងចំណោម ' : 'Choose one of ') + KIDS[i].length + (kh ? ' កូដ ឧ. ' : ' specific codes, e.g. ') + KIDS[i].slice(0, 3).map(x => C[x]).join(', ');
+        if (r.st === 'x') hint = r.near >= 0 ? (kh ? 'កូដជិតបំផុតដែលមាន៖ ' : 'Closest existing code: ') + C[r.near] + ' – ' + EN[r.near] : (kh ? 'ពិនិត្យអក្សរ/លេខ ឬស្វែងរកតាមឈ្មោះជំងឺ' : 'Check the letters/digits or search by diagnosis name');
+        if (r.st === 'l') hint = t('local');
+        const open = i >= 0 ? i : r.near;
+        return `<div class="cr" ${open >= 0 ? `data-open="${open}" role="button" tabindex="0" style="cursor:pointer"` : ''}><span class="n" style="width:26px;flex:none;color:var(--ink3);font-weight:700">${k + 1}</span><div style="flex:1;min-width:0">
+          <div><b class="mono" style="color:var(--blue-d)">${esc(r.c)}</b> <span class="tag ${cls[r.st]}">${lab[r.st]}</span>${r.dup ? ` <span class="tag h">${kh ? 'ស្ទួន' : 'duplicate'}</span>` : ''}</div>
+          ${nm ? `<div class="small">${esc(nm)}</div>` : ''}${hint ? `<div class="e">${esc(hint)}</div>` : ''}</div></div>`; }).join('')}</div>`;
+  }
+  out.innerHTML = `<h2 class="vt">✔ ${t('ckTitle')}</h2>
+    <p class="small muted" style="margin:0 2px 10px">${t('ckSub')}. ${kh ? 'ទម្រង់ណាក៏បាន៖ មួយបន្ទាត់មួយកូដ ឬញែកដោយក្បៀស។ ឧ. J18.9, A419, O14.1' : 'Any format: one per line or separated by commas, e.g. J18.9, A419, O14.1'}</p>
+    <textarea class="in mono" id="ckIn" style="min-height:140px" placeholder="J18.9&#10;A41.9 Sepsis&#10;O14.1&#10;S52.5">${esc(txt)}</textarea>
+    <div class="btns" style="margin-top:10px"><button class="btn p" id="ckGo">✔ ${t('ckTitle')}</button><button class="btn g" id="ckFromList">${kh ? 'យកពីបញ្ជីអ្នកជំងឺ' : 'Use my patient list'}</button><button class="btn g" id="ckClr">${t('clear')}</button></div>
+    ${body}${creditHTML()}`;
+  $('#ckGo').onclick = () => {
+    const v = $('#ckIn').value; store.set('cktext', v);
+    const seen = new Set(); ckRes = parseCodes(v).map(x => { const r = Object.assign({ c: x.c, raw: x.raw }, checkOne(x.c)); r.dup = seen.has(x.c); seen.add(x.c); return r; });
+    if (!ckRes.length) toast(S.lang === 'kh' ? 'រកមិនឃើញកូដក្នុងអត្ថបទ' : 'No codes found in the text');
+    countUse('search'); renderCheck();
+  };
+  $('#ckFromList').onclick = () => { $('#ckIn').value = store.get('list', []).map(x => x.c).join('\n'); $('#ckGo').click(); };
+  $('#ckClr').onclick = () => { store.set('cktext', ''); ckRes = null; renderCheck(); };
+  out.querySelectorAll('[data-open]').forEach(b => { b.onclick = () => openDetail(+b.dataset.open); b.onkeydown = e => { if (e.key === 'Enter') b.click(); }; });
+  const a = $('#ckAdd'); if (a) a.onclick = () => { ckRes.filter(r => (r.st === 'ok' || r.st === 'l') && !r.dup).forEach(r => { if (!listHas(C[r.i])) addToList(r.i); }); show('mylist'); };
+  const x = $('#ckXls'); if (x) x.onclick = () => xlsx('KCPH_ICD10_code_check', 'ICD-10 code check', ['No.', 'Entered', 'Code', 'Result', 'Diagnosis (English)', 'Diagnosis (Khmer)', 'Suggestion'],
+    ckRes.map((r, k) => { const i = r.i; const res = { ok: 'Valid, codable', h: 'Incomplete – needs more digits', l: 'KCPH local code', x: 'Not in code list' }[r.st] + (r.dup ? ' (duplicate)' : '');
+      const sug = r.st === 'h' ? 'Choose a specific code: ' + KIDS[i].slice(0, 5).map(z => C[z]).join(', ') + (KIDS[i].length > 5 ? ' …' : '') : r.st === 'x' && r.near >= 0 ? 'Closest existing: ' + C[r.near] + ' – ' + EN[r.near] : '';
+      return [k + 1, r.raw, r.c, res, i >= 0 ? EN[i] : '', i >= 0 ? KHL[i] : '', sug]; }), [6, 12, 11, 30, 60, 40, 60]);
+}
+
+/* ---------- voice search (Chrome/Android; needs internet) ---------- */
+function setupVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SR) return;
+  const b = $('#qMic'); b.classList.remove('hidden'); let rec = null;
+  b.onclick = () => {
+    if (rec) { rec.stop(); return; }
+    if (!navigator.onLine) { toast(S.lang === 'kh' ? 'ត្រូវការអ៊ីនធឺណិត' : 'Internet connection needed'); return; }
+    rec = new SR(); rec.lang = S.lang === 'kh' ? 'km-KH' : 'en-US'; rec.interimResults = true; rec.maxAlternatives = 1;
+    b.classList.add('on'); toast(t('listen'));
+    rec.onresult = e => { const tx = [...e.results].map(r => r[0].transcript).join(' '); $('#q').value = tx; doSearch(); };
+    rec.onend = rec.onerror = () => { b.classList.remove('on'); rec = null; };
+    try { rec.start(); } catch (e) { b.classList.remove('on'); rec = null; }
+  };
+}
+
+/* ---------- utils ---------- */
+function xlsx(file, ttl, head, rows, widths) {
+  xlsxBook(file + '_' + new Date().toISOString().slice(0, 10), [{ name: 'ICD-10', title: ttl, head, rows, widths }]);
+}
+function xlsxBook(file, sheets) {
+  if (!window.XLSX) { toast('Excel library not loaded'); return; }
+  const d = new Date(), wb = XLSX.utils.book_new();
+  sheets.forEach(sh => {
+    const aoa = [[HOSP_EN + ' · ' + HOSP_KH], [sh.title], ['Generated ' + d.toLocaleString('en-GB') + ' · Codes: ' + (META.src || '')], [], sh.head, ...sh.rows, [], ['KCPH ICD-10 Finder — developed by ' + AUTHOR_EN + ', ' + AUTHOR_ROLE_EN]];
+    const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = (sh.widths || []).map(w => ({ wch: w }));
+    XLSX.utils.book_append_sheet(wb, ws, sh.name.slice(0, 31));
+  });
+  wb.Props = { Title: sheets[0].title, Author: AUTHOR_EN, Company: HOSP_EN };
+  XLSX.writeFile(wb, file + '.xlsx'); countUse('export');
+}
+async function copyText(s) {
+  try { await navigator.clipboard.writeText(s); } catch (e) { const ta = document.createElement('textarea'); ta.value = s; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (x) {} ta.remove(); }
+  toast(t('copied'));
+}
+let toastT;
+function toast(m) { let e = $('.toast'); if (!e) { e = document.createElement('div'); e.className = 'toast'; document.body.appendChild(e); } e.textContent = m; clearTimeout(toastT); toastT = setTimeout(() => e.remove(), 2200); }
+function applyLang() {
+  document.documentElement.lang = S.lang === 'kh' ? 'km' : 'en';
+  document.querySelectorAll('[data-t]').forEach(e => e.textContent = t(e.dataset.t));
+  $('#q').placeholder = t('qPh');
+  $('#langBtn').textContent = S.lang === 'kh' ? 'English' : 'ខ្មែរ';
+}
+function setLang(l) { S.lang = l; saveS(); applyLang(); show(view); }
+function netState() { $('#net').classList.toggle('off', !navigator.onLine); $('#net').title = navigator.onLine ? 'online' : 'offline'; if (navigator.onLine) flushOutbox(); }
+
+/* ---------- start ---------- */
+(async function start() {
+  $('#barLogo').src = LOGO; applyLang();
+  try { await loadData(); }
+  catch (e) { $('#ldMsg').innerHTML = 'Could not load the code list. Please check the connection and reload.<br>មិនអាចផ្ទុកបញ្ជីកូដបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត ហើយបើកម្តងទៀត។'; return; }
+  if (S.fr) loadFr().then(() => show(view));
+  $('#load').remove();
+  document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { if (b.dataset.v === 'services' && view === 'services') curSvc = null; if (b.dataset.v === 'browse' && view === 'browse') brPath = []; show(b.dataset.v); });
+  $('#langBtn').onclick = () => setLang(S.lang === 'kh' ? 'en' : 'kh');
+  $('#q').addEventListener('input', doSearch);
+  $('#q').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { clearTimeout(sTimer); renderSearch(); const f = $('#sOut .row[data-i]'); if (f && $('#q').value.trim()) openDetail(+f.dataset.i); else e.target.blur(); }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && curOv) { closeSheet(); return; }
+    if (e.key === '/' && !curOv && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); if (view !== 'search') show('search'); $('#q').focus(); }
+  });
+  setupVoice();
+  $('#qClr').onclick = () => { $('#q').value = ''; renderSearch(); $('#q').focus(); };
+  document.querySelectorAll('#fChips .chip').forEach(c => c.onclick = () => { F[c.dataset.f] = !F[c.dataset.f]; pageLim.s = 0; renderSearch(); });
+  window.addEventListener('online', netState); window.addEventListener('offline', netState); netState();
+  updCount(); renderSearch(); countUse('open'); maybeSend(true);
+  // deep link: index.html#J18.9 opens that code
+  const goHash = () => { const h = decodeURIComponent(location.hash.slice(1)); if (h === 'report' || h === 'check') show(h); else if (h && IDX.has(h)) openDetail(IDX.get(h)); };
+  goHash(); window.addEventListener('hashchange', goHash);
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+})();
+</script>
+</body>
+</html>
