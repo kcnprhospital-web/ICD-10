@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ICD-10 Application Guide – KCPH</title>
+<meta name="description" content="How to apply ICD-10 codes correctly: rules, examples and common errors. Prepared by Dr. Yeap Kong, Technical Office, Kampong Chhnang Provincial Hospital.">
+<meta name="author" content="Dr. Yeap Kong – Technical Office, Kampong Chhnang Provincial Hospital (KCPH)">
+<meta name="theme-color" content="#2B3990">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+@font-face{font-family:'Kantumruy Pro';font-weight:400;font-display:swap;src:url(fonts/kantumruy-pro-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'Kantumruy Pro';font-weight:600;font-display:swap;src:url(fonts/kantumruy-pro-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'Kantumruy Pro';font-weight:700;font-display:swap;src:url(fonts/kantumruy-pro-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'Kantumruy Pro';font-weight:400;font-display:swap;src:url(fonts/kantumruy-pro-khmer-400-normal.woff2) format('woff2');unicode-range:U+1780-17FF,U+19E0-19FF,U+200C-200D,U+25CC}
+@font-face{font-family:'Kantumruy Pro';font-weight:700;font-display:swap;src:url(fonts/kantumruy-pro-khmer-700-normal.woff2) format('woff2');unicode-range:U+1780-17FF,U+19E0-19FF,U+200C-200D,U+25CC}
+:root{--blue:#2B3990;--blue-d:#1E2A6E;--blue-l:#E9ECF8;--red:#E31E24;--ink:#1B2033;--ink2:#4A5168;--ink3:#6B7186;--line:#DDE1EC;--bg:#F5F6FA;
+--hi:#E02B2B;--hi-t:#FDE7E7;--hi-x:#9B1C1C;--mo:#FFC000;--mo-t:#FFF6DB;--mo-x:#6B4E00;--lo:#00A651;--lo-t:#E8F6EE;--lo-x:#146B3A}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:'Kantumruy Pro','Noto Sans Khmer',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.65}
+.bar{position:sticky;top:0;z-index:20;background:var(--blue);color:#fff;display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 8px) 14px 8px}
+.bar img{width:40px;height:40px;border-radius:10px;background:#fff;padding:2px}
+.bar b{flex:1;font-size:16px;line-height:1.3}
+.bar a{color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:5px 12px;text-decoration:none;font-size:14px;white-space:nowrap}
+.wrap{max-width:900px;margin:0 auto;padding:16px 16px 60px}
+.hero{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;gap:18px;align-items:center}
+.hero img{width:110px;height:110px;flex:none}
+.hero h1{margin:0 0 4px;font-size:25px;line-height:1.3;color:var(--blue-d)}
+.hero p{margin:2px 0;color:var(--ink2);font-size:15px}
+@media (max-width:560px){.hero{flex-direction:column;text-align:center}.hero img{width:96px;height:96px}}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
+.btn{border:1px solid var(--blue);background:#fff;color:var(--blue);border-radius:12px;padding:9px 14px;font-weight:600;font-size:15px;text-decoration:none;cursor:pointer;font-family:inherit}
+.btn.p{background:var(--blue);color:#fff}
+nav.toc{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin:16px 0}
+nav.toc b{color:var(--blue-d)}
+nav.toc ol{margin:8px 0 0;padding-left:22px;columns:2;column-gap:28px}
+@media (max-width:640px){nav.toc ol{columns:1}}
+nav.toc a{color:var(--ink);text-decoration:none}nav.toc a:hover{color:var(--blue)}
+section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:16px 0;scroll-margin-top:70px}
+h2{margin:0 0 10px;font-size:21px;color:var(--blue-d);line-height:1.35}
+h3{margin:18px 0 6px;font-size:17.5px;color:var(--blue)}
+p{margin:8px 0}ul,ol{margin:6px 0;padding-left:22px}li{margin:4px 0}
+a.c{display:inline-block;font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;color:var(--blue-d);background:var(--blue-l);border-radius:6px;padding:0 6px;text-decoration:none;font-size:.93em;white-space:nowrap}
+a.c:hover{background:#D7DCF3}
+.tw{overflow-x:auto;margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--blue-l);color:var(--blue-d)}
+.box{border-radius:12px;padding:12px 14px;margin:10px 0}
+.box.ok{background:var(--lo-t);border-left:5px solid var(--lo)}
+.box.warn{background:var(--mo-t);border-left:5px solid var(--mo)}
+.box.bad{background:var(--hi-t);border-left:5px solid var(--hi)}
+.box.info{background:var(--blue-l);border-left:5px solid var(--blue)}
+.rule{display:flex;gap:12px;align-items:flex-start;margin:12px 0}
+.rule .n{width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.anat{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.anat span{border-radius:10px;padding:8px 12px;color:#fff;font-weight:700;text-align:center;line-height:1.25}
+.anat small{display:block;font-weight:400;font-size:12.5px;opacity:.9}
+.rb{display:inline-block;border-radius:999px;padding:1px 10px;font-weight:700;font-size:14px}
+.rb.r3{background:var(--hi-t);color:var(--hi-x)}.rb.r2{background:var(--mo-t);color:var(--mo-x)}.rb.r1{background:var(--lo-t);color:var(--lo-x)}
+.chk li{list-style:none;margin-left:-22px;padding-left:30px;position:relative}
+.chk li::before{content:"☐";position:absolute;left:4px;color:var(--blue);font-size:18px;line-height:1.4}
+footer{text-align:center;color:var(--ink3);font-size:14px;line-height:1.7;padding:10px}
+footer b{color:var(--blue-d)}
+.top{position:fixed;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--blue);color:#fff;border:0;border-radius:50%;width:46px;height:46px;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.2);cursor:pointer}
+@media print{.bar,.top,.btns,nav.toc{display:none}body{background:#fff;font-size:11.5pt}section,.hero{border:0;padding:6px 0;margin:6px 0;break-inside:auto}h2{break-after:avoid}table{font-size:10pt}a.c{background:none;padding:0}}
+</style>
+</head>
+<body>
+<header class="bar"><img src="__LOGO__" alt="KCPH"><b>ICD-10 Application Guide</b><a href="guide-kh.html">ខ្មែរ</a><a href="index.html">Finder</a></header>
+<div class="wrap">
+
+<div class="hero">
+  <img src="__LOGO__" alt="KCPH logo">
+  <div>
+    <h1>ICD-10 Application Guide for Healthcare Professionals</h1>
+    <p>Kampong Chhnang Provincial Hospital (KCPH)</p>
+    <p>Prepared by <b>Dr. Yeap Kong</b>, Chief, Technical Office, KCPH · Version 1.7 · November 2026</p>
+    <div class="btns"><a class="btn p" href="index.html">Open the ICD-10 Finder</a><a class="btn" href="guide-kh.html">អានជាភាសាខ្មែរ</a><button class="btn" onclick="window.print()">Print / PDF</button></div>
+  </div>
+</div>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">About this guide</a></li>
+<li><a href="#s2">ICD-10 at KCPH</a></li>
+<li><a href="#s3">How to read a code</a></li>
+<li><a href="#s4">Ten rules for correct coding</a></li>
+<li><a href="#s5">Choosing and ordering diagnoses</a></li>
+<li><a href="#s6">Pregnancy, delivery and the puerperium</a></li>
+<li><a href="#s7">Newborns</a></li>
+<li><a href="#s8">Injuries and external causes</a></li>
+<li><a href="#s9">Poisoning and self-harm</a></li>
+<li><a href="#s10">Infections and sepsis</a></li>
+<li><a href="#s11">Chronic diseases (NCD)</a></li>
+<li><a href="#s12">Mental health, cancer, symptoms and Z codes</a></li>
+<li><a href="#s13">Worked examples</a></li>
+<li><a href="#s14">Common errors and how to fix them</a></li>
+<li><a href="#s15">What doctors should write</a></li>
+<li><a href="#s16">KCPH risk colours</a></li>
+<li><a href="#s17">Checklist before you sign</a></li>
+<li><a href="#s18">Using the KCPH ICD-10 Finder</a></li>
+<li><a href="#s19">Smart tools and free AI</a></li>
+</ol></nav>
+
+<section id="s1"><h2>1. About this guide</h2>
+<p>This guide helps doctors, midwives, nurses and medical recorders choose the right ICD-10 code for every patient. Correct codes give accurate hospital statistics, HIS reports, disease surveillance and quality indicators (CHAS), and they help the next clinician understand the patient’s problems.</p>
+<p>Every code in this guide comes from the KCPH master list <b>ICD10-Diagnosis_Updated_9</b>. Tap a code (for example <a class="c" href="index.html#J18.9">J18.9</a>) to open it in the ICD-10 Finder.</p>
+<div class="box info">This guide supports, and does not replace, Ministry of Health and HIS instructions. Where the national rules differ, follow the national rules.</div>
+</section>
+
+<section id="s2"><h2>2. ICD-10 at KCPH</h2>
+<ul>
+<li>The KCPH master list has <b>96,693 codes</b>. It follows the detailed ICD-10-CM structure, which has more digits than the basic WHO ICD-10.</li>
+<li><b>687 codes</b> have a Khmer name. These are marked ★ in the Finder and are the codes KCPH uses most.</li>
+<li>KCPH also has <b>local codes</b> that are not part of standard ICD-10, for example <a class="c" href="index.html#Z36.4.0">Z36.4.0</a>–<a class="c" href="index.html#Z36.4.3">Z36.4.3</a> (ANC visits 1–4), <a class="c" href="index.html#Z39.0.0">Z39.0.0</a> (PNC visit 1), <a class="c" href="index.html#I10.0">I10.0</a>, <a class="c" href="index.html#I10.9">I10.9</a>, and local meanings for <a class="c" href="index.html#A91">A91</a>–<a class="c" href="index.html#A91.3">A91.3</a> (dengue). Use them as your HIS requires. Other facilities should check with their HIS before using them.</li>
+</ul>
+</section>
+
+<section id="s3"><h2>3. How to read a code</h2>
+<p>Every code starts with a <b>letter and two digits</b> (the category). Each extra character adds detail.</p>
+<div class="anat">
+<span style="background:#1E2A6E">T60<small>category: toxic effect of pesticide</small></span>
+<span style="background:#2B3990">.0<small>organophosphate / carbamate</small></span>
+<span style="background:#3F5E99">X<small>placeholder</small></span>
+<span style="background:#B4436C">2<small>intent: self-harm</small></span>
+<span style="background:#E31E24">A<small>initial encounter</small></span>
+</div>
+<p>= <a class="c" href="index.html#T60.0X2A">T60.0X2A</a> Toxic effect of organophosphate insecticide, intentional self-harm, initial encounter.</p>
+<div class="tw"><table>
+<tr><th>Detail</th><th>Where it appears</th><th>Example</th></tr>
+<tr><td>Trimester</td><td>Last digit of many O codes: 1 = first, 2 = second, 3 = third, 4 = during childbirth, 5 = puerperium, 0 / 9 = unspecified</td><td><a class="c" href="index.html#O14.13">O14.13</a> severe pre-eclampsia, third trimester</td></tr>
+<tr><td>Side (laterality)</td><td>Injury, eye, ear and limb codes: 1 = right, 2 = left, 9 = unspecified</td><td><a class="c" href="index.html#S52.502A">S52.502A</a> fracture lower end of <b>left</b> radius</td></tr>
+<tr><td>7th character (encounter)</td><td>Injuries, poisoning, external causes: <b>A</b> = initial (active treatment), <b>D</b> = subsequent (healing, follow-up), <b>S</b> = sequela (late effect)</td><td><a class="c" href="index.html#S06.0X0A">S06.0X0A</a> concussion, initial encounter</td></tr>
+<tr><td>Fetus</td><td>Some O codes: 0 = single or unspecified, 1–9 = fetus 1–9 in multiple pregnancy</td><td><a class="c" href="index.html#O36.4XX0">O36.4XX0</a> intrauterine death, single fetus</td></tr>
+<tr><td>Placeholder X</td><td>Fills empty positions so the 7th character is in the right place</td><td><a class="c" href="index.html#W19.XXXA">W19.XXXA</a> unspecified fall, initial</td></tr>
+</table></div>
+<div class="box warn"><b>Codable or heading?</b> A code that has more specific codes under it is a <b>heading</b> and should not be recorded. For example <a class="c" href="index.html#J18">J18</a> is a heading; record <a class="c" href="index.html#J18.9">J18.9</a>. The Finder marks codes as <b>✓ Codable</b> or <b>Heading</b>.</div>
+</section>
+
+<section id="s4"><h2>4. Ten rules for correct coding</h2>
+<div class="rule"><span class="n">1</span><div><b>Code only what the clinician documented.</b> Coders do not diagnose. If the record is unclear, ask the doctor.</div></div>
+<div class="rule"><span class="n">2</span><div><b>Main condition first.</b> The first code is the condition mainly responsible for the visit or admission (after investigation). Then add complications and other conditions that were treated or affected care.</div></div>
+<div class="rule"><span class="n">3</span><div><b>Use the most specific codable code.</b> Never record a heading. Choose the code that matches the documented type, site, side, severity, trimester and encounter.</div></div>
+<div class="rule"><span class="n">4</span><div><b>Avoid “unspecified” when details are known.</b> If the malaria test shows <i>P. falciparum</i>, use <a class="c" href="index.html#B50.9">B50.9</a>, not <a class="c" href="index.html#B54">B54</a>.</div></div>
+<div class="rule"><span class="n">5</span><div><b>Replace symptom codes with the confirmed diagnosis.</b> Use R codes (for example <a class="c" href="index.html#R50.9">R50.9</a> fever) only when no diagnosis has been made.</div></div>
+<div class="rule"><span class="n">6</span><div><b>Use combination codes.</b> When one code describes two conditions together, use it instead of two separate codes, for example <a class="c" href="index.html#I11.0">I11.0</a> hypertensive heart disease with heart failure, or <a class="c" href="index.html#E11.22">E11.22</a> type 2 diabetes with diabetic chronic kidney disease.</div></div>
+<div class="rule"><span class="n">7</span><div><b>Pregnant women: O codes come first.</b> A condition in pregnancy, childbirth or the puerperium is coded with the O chapter unless the pregnancy is truly incidental (<a class="c" href="index.html#Z33.1">Z33.1</a>).</div></div>
+<div class="rule"><span class="n">8</span><div><b>Injury and poisoning: add the cause.</b> Add an external cause code (V–Y) after the injury or poisoning code. External cause codes are never the main diagnosis.</div></div>
+<div class="rule"><span class="n">9</span><div><b>Severity and stage matter.</b> Record the depression severity, CKD stage, sepsis with or without shock, asthma exacerbation, and so on. These details change the risk colour and the treatment.</div></div>
+<div class="rule"><span class="n">10</span><div><b>One code once.</b> Do not repeat the same code, and do not code conditions that no longer affect care.</div></div>
+</section>
+
+<section id="s5"><h2>5. Choosing and ordering diagnoses</h2>
+<ul>
+<li><b>Main diagnosis (inpatient):</b> the condition established after study as chiefly responsible for the admission.</li>
+<li><b>Main diagnosis (OPD/ER):</b> the main reason for the visit.</li>
+<li><b>Other diagnoses:</b> complications and coexisting conditions that were treated, investigated or extended the stay. Do not code old problems that no longer matter.</li>
+<li><b>Uncertain diagnoses:</b> for inpatients, a diagnosis written at discharge as “probable” or “suspected” is coded as if confirmed. For OPD visits, code the symptoms or signs instead. Follow your HIS rule if it is different.</li>
+<li><b>Two equal conditions:</b> put first the one that used more resources or was the reason for admission.</li>
+</ul>
+<div class="box ok"><b>Example:</b> admitted with pneumonia, developed acute respiratory failure, known COPD: <a class="c" href="index.html#J18.9">J18.9</a> → <a class="c" href="index.html#J96.01">J96.01</a> → <a class="c" href="index.html#J44.9">J44.9</a>.</div>
+</section>
+
+<section id="s6"><h2>6. Pregnancy, delivery and the puerperium (O, Z3x)</h2>
+<ul>
+<li><b>Normal ANC visit:</b> <a class="c" href="index.html#Z34.0">Z34.0x</a> (first pregnancy) or <a class="c" href="index.html#Z34.8">Z34.8x</a> (later pregnancy), with the trimester digit, for example <a class="c" href="index.html#Z34.83">Z34.83</a>. KCPH also records the visit number with <a class="c" href="index.html#Z36.4.0">Z36.4.0</a>–<a class="c" href="index.html#Z36.4.3">Z36.4.3</a> (ANC 1–4).</li>
+<li><b>High-risk pregnancy follow-up:</b> <a class="c" href="index.html#O09">O09.x</a> (supervision of high-risk pregnancy).</li>
+<li><b>Complications:</b> use the O code with the trimester, for example <a class="c" href="index.html#O14.13">O14.13</a> severe pre-eclampsia, third trimester, or <a class="c" href="index.html#O99.013">O99.013</a> anaemia in pregnancy, third trimester (add <a class="c" href="index.html#D50.9">D50.9</a> to show the type of anaemia).</li>
+<li><b>Trimesters</b> are counted from the first day of the last menstrual period: first trimester under 14 weeks, second 14 to under 28 weeks, third 28 weeks onward.</li>
+<li><b>Delivery:</b> code the delivery (for example <a class="c" href="index.html#O80">O80</a>, <a class="c" href="index.html#O82">O82</a>) and its complications, plus the <b>outcome of delivery</b> on the mother’s record, for example <a class="c" href="index.html#Z37.0">Z37.0</a> single live birth.</li>
+<li><b>Postpartum:</b> complications use O codes with “puerperium”, for example <a class="c" href="index.html#O72.1">O72.1</a> immediate postpartum haemorrhage. KCPH PNC visits: <a class="c" href="index.html#Z39.0.0">Z39.0.0</a>–<a class="c" href="index.html#Z39.0.4">Z39.0.4</a>.</li>
+</ul>
+</section>
+
+<section id="s7"><h2>7. Newborns (P, Z38)</h2>
+<ul>
+<li>The baby’s birth record starts with <a class="c" href="index.html#Z38.0">Z38.0x</a>, for example <a class="c" href="index.html#Z38.00">Z38.00</a> single liveborn, born in hospital, delivered vaginally.</li>
+<li>Then add newborn conditions from the P chapter, for example <a class="c" href="index.html#P59.9">P59.9</a> neonatal jaundice, <a class="c" href="index.html#P07.15">P07.15</a> low birth weight 1250–1499 g, <a class="c" href="index.html#P22.0">P22.0</a> respiratory distress syndrome.</li>
+<li>Never use P codes on the mother’s record, or O codes on the baby’s record.</li>
+</ul>
+</section>
+
+<section id="s8"><h2>8. Injuries and external causes (S, T, V–Y)</h2>
+<ol>
+<li><b>Injury code</b> with the side and the 7th character: <a class="c" href="index.html#S52.502A">S52.502A</a>.</li>
+<li><b>External cause</b>, meaning how it happened: <a class="c" href="index.html#V29.9XXA">V29.9XXA</a> motorcycle rider in a traffic accident, or <a class="c" href="index.html#W19.XXXA">W19.XXXA</a> fall.</li>
+<li>Optional <b>place</b>: <a class="c" href="index.html#Y92.410">Y92.410</a> street or highway.</li>
+</ol>
+<div class="box warn">Use <b>A</b> while the patient receives active treatment (ER, surgery, admission). Use <b>D</b> for later visits during healing, such as dressing changes or cast checks. Use <b>S</b> for long-term complications of an old injury.</div>
+</section>
+
+<section id="s9"><h2>9. Poisoning and self-harm (T36–T65)</h2>
+<ul>
+<li>Choose the <b>substance</b> code. The 6th character gives the <b>intent</b>: 1 = accidental, 2 = intentional self-harm, 3 = assault, 4 = undetermined. The 7th character gives the encounter.</li>
+<li>Code the effects as well, for example coma or respiratory failure.</li>
+<li><b>Self-harm at KCPH:</b> add <a class="c" href="index.html#T14.91">T14.91</a> suicide attempt and the cause code <a class="c" href="index.html#X60">X60</a>, and refer the patient for mental health review. On later visits, record the history with <a class="c" href="index.html#Z91.5">Z91.5</a>.</li>
+<li>Snake bite: <a class="c" href="index.html#T63.0">T63.0x</a>. Anaphylaxis: <a class="c" href="index.html#T78.2">T78.2</a>.</li>
+</ul>
+</section>
+
+<section id="s10"><h2>10. Infections and sepsis</h2>
+<ul>
+<li><b>Sepsis:</b> code the sepsis first (<a class="c" href="index.html#A41.9">A41.9</a>, or the organism, for example <a class="c" href="index.html#A41.51">A41.51</a> E. coli), then the source (for example <a class="c" href="index.html#N39.0">N39.0</a>), then <a class="c" href="index.html#R65.20">R65.20</a> severe sepsis or <a class="c" href="index.html#R65.21">R65.21</a> septic shock.</li>
+<li><b>HIV:</b> the KCPH list has <a class="c" href="index.html#B20">B20</a> only, so add the opportunistic infection (for example <a class="c" href="index.html#A15.0">A15.0</a> lung TB). HIV positive without symptoms: <a class="c" href="index.html#Z21">Z21</a>.</li>
+<li><b>Dengue (KCPH local meanings):</b> <a class="c" href="index.html#A90">A90</a> dengue fever, <a class="c" href="index.html#A91">A91</a> without shock, <a class="c" href="index.html#A91.1">A91.1</a> with shock, <a class="c" href="index.html#A91.2">A91.2</a> suspected, <a class="c" href="index.html#A91.3">A91.3</a> probable.</li>
+<li><b>Malaria:</b> use the species code after the test (<a class="c" href="index.html#B50.9">B50.9</a> falciparum, <a class="c" href="index.html#B51.9">B51.9</a> vivax).</li>
+<li><b>Notifiable diseases</b> (TB, cholera, dengue, malaria, rabies, tetanus, measles and others) must also be reported to the surveillance focal point.</li>
+</ul>
+</section>
+
+<section id="s11"><h2>11. Chronic diseases (NCD)</h2>
+<ul>
+<li><b>Hypertension:</b> in the KCPH list <a class="c" href="index.html#I10">I10</a> has the local codes <a class="c" href="index.html#I10.0">I10.0</a> and <a class="c" href="index.html#I10.9">I10.9</a>; use the one your HIS requires. With heart disease use <a class="c" href="index.html#I11.0">I11.x</a>, with chronic kidney disease <a class="c" href="index.html#I12.9">I12.x</a>, with both <a class="c" href="index.html#I13">I13.x</a>.</li>
+<li><b>Type 2 diabetes:</b> <a class="c" href="index.html#E11.9">E11.9</a> without complications. With complications use the combination code, for example <a class="c" href="index.html#E11.22">E11.22</a> with diabetic CKD plus the stage <a class="c" href="index.html#N18.30">N18.3x</a>, or <a class="c" href="index.html#E11.65">E11.65</a> with hyperglycaemia. Gestational diabetes is an O code (<a class="c" href="index.html#O24.410">O24.41x</a>).</li>
+<li><b>Stroke:</b> <a class="c" href="index.html#I64">I64</a> only until CT is done, then <a class="c" href="index.html#I63.9">I63.9</a> (infarct) or <a class="c" href="index.html#I61.9">I61.9</a> (bleed). On follow-up visits code the after-effects with <a class="c" href="index.html#I69.3">I69.3x</a>, not a new acute stroke.</li>
+<li><b>COPD and asthma:</b> show an exacerbation (<a class="c" href="index.html#J44.1">J44.1</a>, <a class="c" href="index.html#J45.901">J45.901</a>) or status asthmaticus (<a class="c" href="index.html#J45.902">J45.902</a>).</li>
+</ul>
+</section>
+
+<section id="s12"><h2>12. Mental health, cancer, symptoms and Z codes</h2>
+<h3>Mental health</h3>
+<ul>
+<li>Depression: always give the severity (<a class="c" href="index.html#F32.1">F32.1</a> moderate). Avoid <a class="c" href="index.html#F32.9">F32.9</a> when the severity is known.</li>
+<li>Alcohol and drugs: give the substance and the pattern (harmful use, dependence <a class="c" href="index.html#F10.20">F10.20</a>, withdrawal with delirium <a class="c" href="index.html#F10.231">F10.231</a>).</li>
+<li>Always ask about suicide and record <a class="c" href="index.html#R45.851">R45.851</a> when suicidal thoughts are present.</li>
+</ul>
+<h3>Cancer (neoplasms)</h3>
+<ul><li>C codes = malignant, D00–D09 = in situ, D10–D36 = benign, D37–D49 = uncertain behaviour. Give the site, for example <a class="c" href="index.html#C53.9">C53.9</a> cervix uteri, or <a class="c" href="index.html#D25.9">D25.9</a> uterine leiomyoma (fibroid).</li></ul>
+<h3>Symptoms (R) and factors (Z)</h3>
+<ul><li>Use R codes only when no diagnosis is made. Use Z codes for visits that are not for a disease, for example vaccination (<a class="c" href="index.html#Z23">Z23</a>), contraception (<a class="c" href="index.html#Z30.0">Z30.0x</a>), check-ups (<a class="c" href="index.html#Z00.00">Z00.00</a>) or follow-up after treatment (<a class="c" href="index.html#Z09">Z09</a>).</li></ul>
+</section>
+
+<section id="s13"><h2>13. Worked examples</h2>
+<div class="tw"><table>
+<tr><th>#</th><th>Patient</th><th>Codes (in order)</th><th>Why</th></tr>
+<tr><td>1</td><td>Admitted with pneumonia; SpO₂ 84%, acute respiratory failure</td><td><a class="c" href="index.html#J18.9">J18.9</a> <a class="c" href="index.html#J96.01">J96.01</a></td><td>Main reason first, then the complication</td></tr>
+<tr><td>2</td><td>Urinary infection, E. coli in blood culture, septic shock</td><td><a class="c" href="index.html#A41.51">A41.51</a> <a class="c" href="index.html#N39.0">N39.0</a> <a class="c" href="index.html#R65.21">R65.21</a></td><td>Sepsis, then source, then shock</td></tr>
+<tr><td>3</td><td>Pregnant woman, 33 weeks, severe pre-eclampsia</td><td><a class="c" href="index.html#O14.13">O14.13</a></td><td>O code with the third-trimester digit</td></tr>
+<tr><td>4</td><td>Routine ANC, second pregnancy, 30 weeks, 3rd ANC visit</td><td><a class="c" href="index.html#Z34.83">Z34.83</a> <a class="c" href="index.html#Z36.4.2">Z36.4.2</a></td><td>Normal pregnancy, plus the KCPH visit number</td></tr>
+<tr><td>5</td><td>Normal vaginal delivery, one live baby</td><td><a class="c" href="index.html#O80">O80</a> <a class="c" href="index.html#Z37.0">Z37.0</a></td><td>Delivery plus outcome on the mother’s record</td></tr>
+<tr><td>6</td><td>Baby born here vaginally, jaundice on day 2</td><td><a class="c" href="index.html#Z38.00">Z38.00</a> <a class="c" href="index.html#P59.9">P59.9</a></td><td>Birth record first, then the newborn condition</td></tr>
+<tr><td>7</td><td>Motorcycle crash on the road, closed fracture of the lower end of the left radius, ER visit</td><td><a class="c" href="index.html#S52.502A">S52.502A</a> <a class="c" href="index.html#V29.9XXA">V29.9XXA</a> <a class="c" href="index.html#Y92.410">Y92.410</a></td><td>Injury with side and A, then cause and place</td></tr>
+<tr><td>8</td><td>Drank organophosphate after a family argument</td><td><a class="c" href="index.html#T60.0X2A">T60.0X2A</a> <a class="c" href="index.html#T14.91">T14.91</a> <a class="c" href="index.html#X60">X60</a></td><td>Substance with intent 2, then suicide attempt and cause</td></tr>
+<tr><td>9</td><td>Type 2 diabetes with kidney disease stage 3, and hypertension</td><td><a class="c" href="index.html#E11.22">E11.22</a> <a class="c" href="index.html#I12.9">I12.9</a> <a class="c" href="index.html#N18.30">N18.30</a></td><td>Combination codes plus the CKD stage</td></tr>
+<tr><td>10</td><td>OPD fever, rapid test positive for P. falciparum, no danger signs</td><td><a class="c" href="index.html#B50.9">B50.9</a></td><td>Confirmed diagnosis, not <a class="c" href="index.html#R50.9">R50.9</a></td></tr>
+</table></div>
+</section>
+
+<section id="s14"><h2>14. Common errors and how to fix them</h2>
+<div class="tw"><table>
+<tr><th>Error</th><th>Wrong</th><th>Right</th></tr>
+<tr><td>Heading code recorded</td><td><a class="c" href="index.html#J18">J18</a>, <a class="c" href="index.html#O14.1">O14.1</a>, <a class="c" href="index.html#S52.5">S52.5</a></td><td><a class="c" href="index.html#J18.9">J18.9</a>, <a class="c" href="index.html#O14.13">O14.13</a>, <a class="c" href="index.html#S52.502A">S52.502A</a></td></tr>
+<tr><td>Unspecified when the result is known</td><td><a class="c" href="index.html#B54">B54</a></td><td><a class="c" href="index.html#B50.9">B50.9</a></td></tr>
+<tr><td>Symptom instead of diagnosis</td><td><a class="c" href="index.html#R50.9">R50.9</a></td><td>The confirmed diagnosis</td></tr>
+<tr><td>Pregnant woman coded without an O code</td><td><a class="c" href="index.html#D50.9">D50.9</a> alone</td><td><a class="c" href="index.html#O99.013">O99.013</a> + <a class="c" href="index.html#D50.9">D50.9</a></td></tr>
+<tr><td>Unspecified trimester</td><td><a class="c" href="index.html#O14.10">O14.10</a></td><td><a class="c" href="index.html#O14.13">O14.13</a></td></tr>
+<tr><td>Injury without cause</td><td><a class="c" href="index.html#S52.502A">S52.502A</a> alone</td><td>+ <a class="c" href="index.html#V29.9XXA">V29.9XXA</a></td></tr>
+<tr><td>Poisoning without intent and self-harm codes</td><td>Substance only</td><td><a class="c" href="index.html#T60.0X2A">T60.0X2A</a> + <a class="c" href="index.html#T14.91">T14.91</a> + <a class="c" href="index.html#X60">X60</a></td></tr>
+<tr><td>Sepsis coded only as the source</td><td><a class="c" href="index.html#J18.9">J18.9</a> alone</td><td><a class="c" href="index.html#A41.9">A41.9</a> + <a class="c" href="index.html#J18.9">J18.9</a> + <a class="c" href="index.html#R65.20">R65.2x</a></td></tr>
+<tr><td>Stroke type not updated after CT</td><td><a class="c" href="index.html#I64">I64</a></td><td><a class="c" href="index.html#I63.9">I63.9</a> / <a class="c" href="index.html#I61.9">I61.9</a></td></tr>
+<tr><td>Separate codes where a combination exists</td><td><a class="c" href="index.html#I10">I10</a> + <a class="c" href="index.html#N18.30">N18.30</a></td><td><a class="c" href="index.html#I12.9">I12.9</a> + <a class="c" href="index.html#N18.30">N18.30</a></td></tr>
+<tr><td>Severity missing</td><td><a class="c" href="index.html#F32.9">F32.9</a></td><td><a class="c" href="index.html#F32.1">F32.1</a> (moderate)</td></tr>
+</table></div>
+<div class="box info">Use <b>Check codes</b> in the Finder: paste the codes from the EMR and it shows headings, unknown codes and duplicates.</div>
+</section>
+
+<section id="s15"><h2>15. What doctors should write</h2>
+<p>A coder can only code what is written. Please document:</p>
+<ul>
+<li><b>Type and cause:</b> organism (E. coli, P. falciparum), substance, mechanism of injury</li>
+<li><b>Site and side:</b> left or right, upper or lower, exact bone or organ</li>
+<li><b>Severity and stage:</b> mild, moderate or severe; CKD stage; with or without shock; with psychotic features</li>
+<li><b>Acute or chronic</b>, first episode or recurrent, exacerbation</li>
+<li><b>Pregnancy:</b> gestational age in weeks, gravida and parity, ANC visit number</li>
+<li><b>Links between conditions:</b> “due to”, “secondary to”, “complicated by”</li>
+<li><b>Final diagnosis at discharge</b>, replacing working diagnoses and symptoms</li>
+</ul>
+</section>
+
+<section id="s16"><h2>16. KCPH risk colours</h2>
+<p>For five services (Maternal &amp; Newborn, NCD, Internal Medicine, Surgery, Mental Health), each code carries a KCPH risk colour:</p>
+<div class="tw"><table>
+<tr><th>Colour</th><th>Meaning</th><th>Action</th></tr>
+<tr><td><span class="rb r3">RED · High</span></td><td>Life-threatening or danger sign</td><td>Act now; senior doctor; emergency protocol; consider ICU or referral</td></tr>
+<tr><td><span class="rb r2">YELLOW · Moderate</span></td><td>Needs a doctor’s assessment</td><td>Written plan the same day; often admit or follow up closely</td></tr>
+<tr><td><span class="rb r1">GREEN · Low</span></td><td>Routine or mild condition</td><td>Usual care and scheduled follow-up</td></tr>
+</table></div>
+<div class="box warn">Colours are a triage aid prepared at KCPH. They do not replace clinical judgement, triage scores or national protocols.</div>
+</section>
+
+<section id="s17"><h2>17. Checklist before you sign or enter the record</h2>
+<ul class="chk">
+<li>The main diagnosis is first</li>
+<li>Every code is <b>✓ Codable</b> (not a heading)</li>
+<li>Side, trimester, stage, severity and 7th character are filled in</li>
+<li>Symptom codes are replaced by confirmed diagnoses</li>
+<li>Pregnant or postpartum women have O codes; newborns have Z38/P codes</li>
+<li>Injuries and poisonings have the external cause (and intent)</li>
+<li>Sepsis has its source and its severity</li>
+<li>No duplicate codes; KCPH local codes are used as HIS requires</li>
+<li>Notifiable diseases are reported</li>
+</ul>
+</section>
+
+<section id="s18"><h2>18. Using the KCPH ICD-10 Finder</h2>
+<ol>
+<li><b>Search</b> by code (<code>J18</code>, <code>J189</code>), English words, Khmer words (<code>រលាកសួត</code>, <code>ទឹកនោមផ្អែម</code>) or abbreviations (HTN, COPD, PPH). Spelling mistakes are corrected automatically, and on Chrome or Android you can tap the 🎤 button to search by voice.</li>
+<li><b>Set your department</b> (for example Maternal &amp; Newborn) so your codes come first.</li>
+<li>On each result, tap <b>⧉</b> to copy the code for the EMR or <b>＋</b> to add it to the patient list.</li>
+<li>Tap a code to see whether it is codable, its KCPH risk colour, coding notes and more specific codes.</li>
+<li><b>My list</b>: put the main diagnosis first, then copy, print or download to Excel.</li>
+<li><b>Check codes</b>: paste codes from the EMR or a report to find heading codes, unknown codes and duplicates.</li>
+<li>The Finder works offline after the first visit, and you can install it on your phone (Help › Install).</li>
+</ol>
+<div class="btns"><a class="btn p" href="index.html">Open the ICD-10 Finder</a><a class="btn" href="index.html#check">Check codes</a></div>
+</section>
+
+<section id="s19"><h2>19. Smart tools and free AI (version 1.7)</h2>
+<ol>
+<li><b>Write like a doctor.</b> The search understands shorthand and context: <code>k/c HTN</code>, <code>T2DM + CKD 3</code>, <code>G2P1 34 wks anaemia</code>, <code>lt # femur</code>, <code>h/o TB</code>, lay words (<code>heart attack</code>, <code>loose motion</code>) and Khmer (<code>មានផ្ទៃពោះ ៧ ខែ ក្រឡាភ្លើង</code>). Weeks of pregnancy choose the trimester; "PE" means pre-eclampsia in pregnancy and pulmonary embolism otherwise.</li>
+<li><b>Several diagnoses at once.</b> Separate them with commas: the Finder shows the best 3 codes for each, coding tips (combination codes, external causes, sepsis order…) and <b>＋ Add all best codes</b>.</li>
+<li><b>Free AI.</b> When you are online and type a sentence, the AI (Google Gemini) also suggests codes with a short reason. Only codes that exist in the KCPH list are shown. You can turn this off in Help › Settings.</li>
+<li><b>📷 Photo / text → codes.</b> Take a photo of the diagnoses (handwriting works) or paste a discharge summary. The AI lists every diagnosis in order (main, other, external cause). Tick the codes to keep and add them to My list.</li>
+<li><b>🧠 Check &amp; audit codes.</b> The audit scores a code list (0–100) and explains problems: wrong order, missing combination codes (E11.22, I11.0, I12.9, I13.0), missing external cause or Z37, mother and baby codes mixed, symptom codes that are not needed. <b>AI audit</b> gives a second opinion.</li>
+<li><b>💾 Disease register.</b> In My list, enter date, sex, age and OPD/IPD, then <b>Save &amp; start next patient</b>. Only the date, sex, age group, codes and department are saved — never the name or patient number.</li>
+<li><b>📈 Disease statistics.</b> Monthly top 10 diagnoses, age group × sex, ICD-10 chapters and departments for this device or your whole facility, with Excel and PDF — ready for HIS reports and quality meetings.</li>
+<li><b>🎓 Training &amp; quiz.</b> 32 real cases (maternal &amp; newborn, NCD, surgery, mental health, children) with scores and explanations. Results appear in the monthly report for training follow-up.</li>
+</ol>
+<p class="warn"><b>Privacy:</b> the free AI service may be used by Google to improve its products. Never type or photograph a patient’s name, ID number, phone or address — cover or crop them first. Always check AI codes against the record: the final decision is the clinician’s.</p>
+<div class="btns"><a class="btn p" href="index.html#doc">Photo / text → codes</a><a class="btn" href="index.html#check">Check &amp; audit</a><a class="btn" href="index.html#quiz">Training &amp; quiz</a><a class="btn" href="index.html#stats">Disease statistics</a></div>
+</section>
+
+
+<footer>
+Prepared by <b>Dr. Yeap Kong</b><br>Chief, Technical Office, Kampong Chhnang Provincial Hospital (KCPH)<br>
+Codes: KCPH master list ICD10-Diagnosis_Updated_9 · Version 1.7 · November 2026<br>
+Please send corrections through the Finder (Help › Report a problem).
+</footer>
+</div>
+<button class="top" onclick="scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
+</body>
+</html>

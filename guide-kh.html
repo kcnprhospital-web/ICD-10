@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>សៀវភៅណែនាំការប្រើកូដ ICD-10 – KCPH</title>
+<meta name="description" content="សៀវភៅណែនាំការប្រើកូដ ICD-10៖ វិធាន ឧទាហរណ៍ និងកំហុសញឹកញាប់។ រៀបចំដោយ Dr. Yeap Kong ការិយាល័យបច្ចេកទេស មន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង។">
+<meta name="author" content="Dr. Yeap Kong – Technical Office, Kampong Chhnang Provincial Hospital (KCPH)">
+<meta name="theme-color" content="#2B3990">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+@font-face{font-family:'Kantumruy Pro';font-weight:400;font-display:swap;src:url(fonts/kantumruy-pro-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'Kantumruy Pro';font-weight:600;font-display:swap;src:url(fonts/kantumruy-pro-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'Kantumruy Pro';font-weight:700;font-display:swap;src:url(fonts/kantumruy-pro-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-21FF}
+@font-face{font-family:'Kantumruy Pro';font-weight:400;font-display:swap;src:url(fonts/kantumruy-pro-khmer-400-normal.woff2) format('woff2');unicode-range:U+1780-17FF,U+19E0-19FF,U+200C-200D,U+25CC}
+@font-face{font-family:'Kantumruy Pro';font-weight:600;font-display:swap;src:url(fonts/kantumruy-pro-khmer-600-normal.woff2) format('woff2');unicode-range:U+1780-17FF,U+19E0-19FF,U+200C-200D,U+25CC}
+@font-face{font-family:'Kantumruy Pro';font-weight:700;font-display:swap;src:url(fonts/kantumruy-pro-khmer-700-normal.woff2) format('woff2');unicode-range:U+1780-17FF,U+19E0-19FF,U+200C-200D,U+25CC}
+:root{--blue:#2B3990;--blue-d:#1E2A6E;--blue-l:#E9ECF8;--red:#E31E24;--ink:#1B2033;--ink2:#4A5168;--ink3:#6B7186;--line:#DDE1EC;--bg:#F5F6FA;
+--hi:#E02B2B;--hi-t:#FDE7E7;--hi-x:#9B1C1C;--mo:#FFC000;--mo-t:#FFF6DB;--mo-x:#6B4E00;--lo:#00A651;--lo-t:#E8F6EE;--lo-x:#146B3A}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:'Kantumruy Pro','Noto Sans Khmer',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.8}
+.bar{position:sticky;top:0;z-index:20;background:var(--blue);color:#fff;display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 8px) 14px 8px}
+.bar img{width:40px;height:40px;border-radius:10px;background:#fff;padding:2px}
+.bar b{flex:1;font-size:16px;line-height:1.3}
+.bar a{color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:5px 12px;text-decoration:none;font-size:14px;white-space:nowrap}
+.wrap{max-width:900px;margin:0 auto;padding:16px 16px 60px}
+.hero{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;gap:18px;align-items:center}
+.hero img{width:110px;height:110px;flex:none}
+.hero h1{margin:0 0 4px;font-size:25px;line-height:1.3;color:var(--blue-d)}
+.hero p{margin:2px 0;color:var(--ink2);font-size:15px}
+@media (max-width:560px){.hero{flex-direction:column;text-align:center}.hero img{width:96px;height:96px}}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
+.btn{border:1px solid var(--blue);background:#fff;color:var(--blue);border-radius:12px;padding:9px 14px;font-weight:600;font-size:15px;text-decoration:none;cursor:pointer;font-family:inherit}
+.btn.p{background:var(--blue);color:#fff}
+nav.toc{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin:16px 0}
+nav.toc b{color:var(--blue-d)}
+nav.toc ol{margin:8px 0 0;padding-left:22px;columns:2;column-gap:28px}
+@media (max-width:640px){nav.toc ol{columns:1}}
+nav.toc a{color:var(--ink);text-decoration:none}nav.toc a:hover{color:var(--blue)}
+section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:16px 0;scroll-margin-top:70px}
+h2{margin:0 0 10px;font-size:21px;color:var(--blue-d);line-height:1.35}
+h3{margin:18px 0 6px;font-size:17.5px;color:var(--blue)}
+p{margin:8px 0}ul,ol{margin:6px 0;padding-left:22px}li{margin:4px 0}
+a.c{display:inline-block;font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;color:var(--blue-d);background:var(--blue-l);border-radius:6px;padding:0 6px;text-decoration:none;font-size:.93em;white-space:nowrap}
+a.c:hover{background:#D7DCF3}
+.tw{overflow-x:auto;margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--blue-l);color:var(--blue-d)}
+.box{border-radius:12px;padding:12px 14px;margin:10px 0}
+.box.ok{background:var(--lo-t);border-left:5px solid var(--lo)}
+.box.warn{background:var(--mo-t);border-left:5px solid var(--mo)}
+.box.bad{background:var(--hi-t);border-left:5px solid var(--hi)}
+.box.info{background:var(--blue-l);border-left:5px solid var(--blue)}
+.rule{display:flex;gap:12px;align-items:flex-start;margin:12px 0}
+.rule .n{width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.anat{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.anat span{border-radius:10px;padding:8px 12px;color:#fff;font-weight:700;text-align:center;line-height:1.25}
+.anat small{display:block;font-weight:400;font-size:12.5px;opacity:.9}
+.rb{display:inline-block;border-radius:999px;padding:1px 10px;font-weight:700;font-size:14px}
+.rb.r3{background:var(--hi-t);color:var(--hi-x)}.rb.r2{background:var(--mo-t);color:var(--mo-x)}.rb.r1{background:var(--lo-t);color:var(--lo-x)}
+.chk li{list-style:none;margin-left:-22px;padding-left:30px;position:relative}
+.chk li::before{content:"☐";position:absolute;left:4px;color:var(--blue);font-size:18px;line-height:1.4}
+footer{text-align:center;color:var(--ink3);font-size:14px;line-height:1.7;padding:10px}
+footer b{color:var(--blue-d)}
+.top{position:fixed;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--blue);color:#fff;border:0;border-radius:50%;width:46px;height:46px;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.2);cursor:pointer}
+@media print{.bar,.top,.btns,nav.toc{display:none}body{background:#fff;font-size:11.5pt}section,.hero{border:0;padding:6px 0;margin:6px 0;break-inside:auto}h2{break-after:avoid}table{font-size:10pt}a.c{background:none;padding:0}}
+</style>
+</head>
+<body>
+<header class="bar"><img src="__LOGO__" alt="KCPH"><b>សៀវភៅណែនាំការប្រើកូដ ICD-10</b><a href="guide-en.html">English</a><a href="index.html">ស្វែងរកកូដ</a></header>
+<div class="wrap">
+
+<div class="hero">
+  <img src="__LOGO__" alt="និមិត្តសញ្ញា KCPH">
+  <div>
+    <h1>សៀវភៅណែនាំការប្រើកូដ ICD-10 សម្រាប់បុគ្គលិកសុខាភិបាល</h1>
+    <p>មន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង (KCPH)</p>
+    <p>រៀបចំដោយ <b>Dr. Yeap Kong</b> ប្រធានការិយាល័យបច្ចេកទេស KCPH · កំណែ ១.៧ · ខែវិច្ឆិកា ឆ្នាំ២០២៦</p>
+    <div class="btns"><a class="btn p" href="index.html">បើកឧបករណ៍ស្វែងរកកូដ ICD-10</a><a class="btn" href="guide-en.html">Read in English</a><button class="btn" onclick="window.print()">បោះពុម្ព / PDF</button></div>
+  </div>
+</div>
+
+<nav class="toc"><b>មាតិកា</b>
+<ol>
+<li><a href="#s1">អំពីសៀវភៅណែនាំនេះ</a></li>
+<li><a href="#s2">ICD-10 នៅ KCPH</a></li>
+<li><a href="#s3">របៀបអានកូដ</a></li>
+<li><a href="#s4">វិធាន ១០ សម្រាប់ដាក់កូដត្រឹមត្រូវ</a></li>
+<li><a href="#s5">ការជ្រើស និងរៀបលំដាប់រោគវិនិច្ឆ័យ</a></li>
+<li><a href="#s6">ការមានផ្ទៃពោះ ការសម្រាល និងក្រោយសម្រាល</a></li>
+<li><a href="#s7">ទារកទើបកើត</a></li>
+<li><a href="#s8">របួស និងមូលហេតុខាងក្រៅ</a></li>
+<li><a href="#s9">ការពុល និងការធ្វើបាបខ្លួនឯង</a></li>
+<li><a href="#s10">ជំងឺឆ្លង និង sepsis</a></li>
+<li><a href="#s11">ជំងឺរ៉ាំរ៉ៃ (ជំងឺមិនឆ្លង)</a></li>
+<li><a href="#s12">សុខភាពផ្លូវចិត្ត មហារីក រោគសញ្ញា និងកូដ Z</a></li>
+<li><a href="#s13">ឧទាហរណ៍អនុវត្ត</a></li>
+<li><a href="#s14">កំហុសញឹកញាប់ និងរបៀបកែ</a></li>
+<li><a href="#s15">អ្វីដែលគ្រូពេទ្យត្រូវសរសេរ</a></li>
+<li><a href="#s16">ពណ៌ហានិភ័យ KCPH</a></li>
+<li><a href="#s17">បញ្ជីត្រួតពិនិត្យមុនចុះហត្ថលេខា</a></li>
+<li><a href="#s18">ការប្រើឧបករណ៍ស្វែងរកកូដ ICD-10 របស់ KCPH</a></li>
+<li><a href="#s19">ឧបករណ៍ឆ្លាតវៃ និង AI ឥតគិតថ្លៃ</a></li>
+</ol></nav>
+
+<section id="s1"><h2>១. អំពីសៀវភៅណែនាំនេះ</h2>
+<p>សៀវភៅណែនាំនេះជួយគ្រូពេទ្យ ឆ្មប គិលានុបដ្ឋាក និងអ្នកកត់ត្រាវេជ្ជសាស្ត្រ ឲ្យជ្រើសកូដ ICD-10 បានត្រឹមត្រូវសម្រាប់អ្នកជំងឺគ្រប់រូប។ កូដត្រឹមត្រូវផ្តល់ស្ថិតិមន្ទីរពេទ្យ របាយការណ៍ HIS ការឃ្លាំមើលជំងឺ និងសូចនាករគុណភាព (CHAS) បានត្រឹមត្រូវ ហើយជួយគ្រូពេទ្យបន្ទាប់ឲ្យយល់ពីបញ្ហារបស់អ្នកជំងឺ។</p>
+<p>កូដទាំងអស់ក្នុងសៀវភៅនេះ មកពីបញ្ជីកូដមេរបស់ KCPH <b>ICD10-Diagnosis_Updated_9</b>។ ចុចលើកូដ (ឧ. <a class="c" href="index.html#J18.9">J18.9</a>) ដើម្បីបើកវាក្នុងឧបករណ៍ស្វែងរកកូដ។</p>
+<div class="box info">សៀវភៅនេះជាជំនួយ មិនជំនួសការណែនាំរបស់ក្រសួងសុខាភិបាល និង HIS ទេ។ បើវិធានថ្នាក់ជាតិខុសពីនេះ សូមអនុវត្តតាមវិធានថ្នាក់ជាតិ។</div>
+</section>
+
+<section id="s2"><h2>២. ICD-10 នៅ KCPH</h2>
+<ul>
+<li>បញ្ជីកូដមេ KCPH មាន <b>កូដ ៩៦,៦៩៣</b>។ វាប្រើរចនាសម្ព័ន្ធលម្អិតរបស់ ICD-10-CM ដែលមានខ្ទង់ច្រើនជាង ICD-10 មូលដ្ឋានរបស់ WHO។</li>
+<li>មាន <b>កូដ ៦៨៧</b> ដែលមានឈ្មោះជាភាសាខ្មែរ។ កូដទាំងនេះមានសញ្ញា ★ ក្នុងឧបករណ៍ ហើយជាកូដដែល KCPH ប្រើញឹកញាប់ជាងគេ។</li>
+<li>KCPH ក៏មាន <b>កូដក្នុងស្រុក</b> ដែលមិនមែនជាផ្នែកនៃ ICD-10 ស្តង់ដារ ឧ. <a class="c" href="index.html#Z36.4.0">Z36.4.0</a>–<a class="c" href="index.html#Z36.4.3">Z36.4.3</a> (ពិនិត្យផ្ទៃពោះលើកទី ១–៤) <a class="c" href="index.html#Z39.0.0">Z39.0.0</a> (ពិនិត្យក្រោយសម្រាលលើកទី ១) <a class="c" href="index.html#I10.0">I10.0</a> <a class="c" href="index.html#I10.9">I10.9</a> និងអត្ថន័យក្នុងស្រុកសម្រាប់ <a class="c" href="index.html#A91">A91</a>–<a class="c" href="index.html#A91.3">A91.3</a> (គ្រុនឈាម)។ សូមប្រើតាមតម្រូវការ HIS។ មូលដ្ឋានសុខាភិបាលផ្សេងទៀត គួរពិនិត្យជាមួយ HIS របស់ខ្លួនមុនប្រើ។</li>
+</ul>
+</section>
+
+<section id="s3"><h2>៣. របៀបអានកូដ</h2>
+<p>កូដនីមួយៗចាប់ផ្តើមដោយ <b>អក្សរមួយ និងលេខពីរខ្ទង់</b> (ក្រុម)។ តួអក្សរបន្ថែមនីមួយៗ ផ្តល់ព័ត៌មានលម្អិតបន្ថែម។</p>
+<div class="anat">
+<span style="background:#1E2A6E">T60<small>ក្រុម៖ ពុលថ្នាំកសិកម្ម</small></span>
+<span style="background:#2B3990">.0<small>organophosphate / carbamate</small></span>
+<span style="background:#3F5E99">X<small>លេខជំនួស</small></span>
+<span style="background:#B4436C">2<small>ចេតនា៖ ធ្វើបាបខ្លួនឯង</small></span>
+<span style="background:#E31E24">A<small>មកលើកដំបូង</small></span>
+</div>
+<p>= <a class="c" href="index.html#T60.0X2A">T60.0X2A</a> ពុលថ្នាំសម្លាប់សត្វល្អិតប្រភេទ organophosphate ដោយចេតនាធ្វើបាបខ្លួនឯង មកលើកដំបូង។</p>
+<div class="tw"><table>
+<tr><th>ព័ត៌មានលម្អិត</th><th>ទីតាំងក្នុងកូដ</th><th>ឧទាហរណ៍</th></tr>
+<tr><td>ត្រីមាស</td><td>លេខចុងក្រោយនៃកូដ O ជាច្រើន៖ 1 = ត្រីមាសទី១ 2 = ទី២ 3 = ទី៣ 4 = ពេលសម្រាល 5 = ក្រោយសម្រាល 0 / 9 = មិនបញ្ជាក់</td><td><a class="c" href="index.html#O14.13">O14.13</a> បំរុងក្រឡាភ្លើងធ្ងន់ ត្រីមាសទី៣</td></tr>
+<tr><td>ខាង (ឆ្វេង/ស្តាំ)</td><td>កូដរបួស ភ្នែក ត្រចៀក និងអវយវៈ៖ 1 = ស្តាំ 2 = ឆ្វេង 9 = មិនបញ្ជាក់</td><td><a class="c" href="index.html#S52.502A">S52.502A</a> បាក់ចុងក្រោមឆ្អឹងកំភួនដៃ (radius) <b>ខាងឆ្វេង</b></td></tr>
+<tr><td>តួអក្សរទី៧ (ប្រភេទនៃការមក)</td><td>របួស ការពុល មូលហេតុខាងក្រៅ៖ <b>A</b> = មកលើកដំបូង (កំពុងព្យាបាលសកម្ម) <b>D</b> = មកតាមដាន (កំពុងជាសះស្បើយ) <b>S</b> = ផលវិបាកយូរអង្វែង</td><td><a class="c" href="index.html#S06.0X0A">S06.0X0A</a> ប៉ះទង្គិចខួរក្បាល មកលើកដំបូង</td></tr>
+<tr><td>ទារកក្នុងផ្ទៃ</td><td>កូដ O ខ្លះ៖ 0 = មួយ ឬមិនបញ្ជាក់ 1–9 = ទារកទី ១–៩ ក្នុងផ្ទៃពោះច្រើន</td><td><a class="c" href="index.html#O36.4XX0">O36.4XX0</a> ទារកស្លាប់ក្នុងស្បូន ទារកមួយ</td></tr>
+<tr><td>លេខជំនួស X</td><td>បំពេញទីតាំងទទេ ដើម្បីឲ្យតួអក្សរទី៧ នៅត្រូវកន្លែង</td><td><a class="c" href="index.html#W19.XXXA">W19.XXXA</a> ធ្លាក់ មិនបញ្ជាក់ មកលើកដំបូង</td></tr>
+</table></div>
+<div class="box warn"><b>កូដប្រើបាន ឬកូដក្បាលក្រុម?</b> កូដដែលមានកូដលម្អិតនៅក្រោម គឺជា <b>កូដក្បាលក្រុម</b> ហើយមិនគួរកត់ត្រាទេ។ ឧ. <a class="c" href="index.html#J18">J18</a> ជាកូដក្បាលក្រុម ត្រូវកត់ <a class="c" href="index.html#J18.9">J18.9</a>។ ឧបករណ៍បង្ហាញ <b>✓ ប្រើបាន</b> ឬ <b>ក្បាលក្រុម</b>។</div>
+</section>
+
+<section id="s4"><h2>៤. វិធាន ១០ សម្រាប់ដាក់កូដត្រឹមត្រូវ</h2>
+<div class="rule"><span class="n">១</span><div><b>ដាក់កូដតែអ្វីដែលគ្រូពេទ្យបានសរសេរ។</b> អ្នកដាក់កូដមិនធ្វើរោគវិនិច្ឆ័យទេ។ បើកំណត់ត្រាមិនច្បាស់ សូមសួរគ្រូពេទ្យ។</div></div>
+<div class="rule"><span class="n">២</span><div><b>រោគវិនិច្ឆ័យចម្បងមុនគេ។</b> កូដទីមួយ គឺជំងឺដែលជាមូលហេតុចម្បងនៃការមក ឬការសម្រាកពេទ្យ (ក្រោយពិនិត្យរួច)។ បន្ទាប់មក បន្ថែមផលវិបាក និងជំងឺផ្សេងទៀតដែលបានព្យាបាល ឬប៉ះពាល់ដល់ការថែទាំ។</div></div>
+<div class="rule"><span class="n">៣</span><div><b>ប្រើកូដលម្អិតបំផុតដែលប្រើបាន។</b> កុំកត់កូដក្បាលក្រុម។ ជ្រើសកូដដែលត្រូវនឹងប្រភេទ ទីតាំង ខាង កម្រិតធ្ងន់ធ្ងរ ត្រីមាស និងប្រភេទនៃការមក ដែលបានសរសេរ។</div></div>
+<div class="rule"><span class="n">៤</span><div><b>ជៀសវាងកូដ «មិនបញ្ជាក់» ពេលដឹងព័ត៌មានលម្អិត។</b> បើតេស្តគ្រុនចាញ់បង្ហាញ <i>P. falciparum</i> ត្រូវប្រើ <a class="c" href="index.html#B50.9">B50.9</a> មិនមែន <a class="c" href="index.html#B54">B54</a> ទេ។</div></div>
+<div class="rule"><span class="n">៥</span><div><b>ប្តូរកូដរោគសញ្ញា ទៅជារោគវិនិច្ឆ័យបញ្ជាក់។</b> ប្រើកូដ R (ឧ. <a class="c" href="index.html#R50.9">R50.9</a> គ្រុន) តែពេលមិនទាន់មានរោគវិនិច្ឆ័យ។</div></div>
+<div class="rule"><span class="n">៦</span><div><b>ប្រើកូដរួម។</b> ពេលមានកូដមួយពណ៌នាជំងឺពីររួមគ្នា ត្រូវប្រើកូដនោះ ជំនួសកូដពីរដាច់ដោយឡែក ឧ. <a class="c" href="index.html#I11.0">I11.0</a> ជំងឺបេះដូងដោយលើសសម្ពាធឈាម មានខ្សោយបេះដូង ឬ <a class="c" href="index.html#E11.22">E11.22</a> ទឹកនោមផ្អែមប្រភេទ២ មានជំងឺតម្រងនោមរ៉ាំរ៉ៃ។</div></div>
+<div class="rule"><span class="n">៧</span><div><b>ស្ត្រីមានផ្ទៃពោះ៖ កូដ O មុនគេ។</b> ជំងឺក្នុងពេលមានផ្ទៃពោះ សម្រាល ឬក្រោយសម្រាល ត្រូវដាក់កូដក្នុងជំពូក O លើកលែងតែការមានផ្ទៃពោះមិនពាក់ព័ន្ធពិតប្រាកដ (<a class="c" href="index.html#Z33.1">Z33.1</a>)។</div></div>
+<div class="rule"><span class="n">៨</span><div><b>របួស និងការពុល៖ បន្ថែមមូលហេតុ។</b> បន្ថែមកូដមូលហេតុខាងក្រៅ (V–Y) បន្ទាប់ពីកូដរបួស ឬការពុល។ កូដមូលហេតុខាងក្រៅ មិនដែលជារោគវិនិច្ឆ័យចម្បងទេ។</div></div>
+<div class="rule"><span class="n">៩</span><div><b>កម្រិតធ្ងន់ធ្ងរ និងដំណាក់កាល មានសារៈសំខាន់។</b> កត់កម្រិតធ្លាក់ទឹកចិត្ត ដំណាក់កាល CKD sepsis មាន ឬគ្មានស្ហុក ហឺតកាន់តែធ្ងន់ ជាដើម។ ព័ត៌មានទាំងនេះប្តូរពណ៌ហានិភ័យ និងការព្យាបាល។</div></div>
+<div class="rule"><span class="n">១០</span><div><b>កូដមួយ កត់តែម្តង។</b> កុំកត់កូដដដែលច្រើនដង ហើយកុំកត់ជំងឺដែលលែងប៉ះពាល់ដល់ការថែទាំ។</div></div>
+</section>
+
+<section id="s5"><h2>៥. ការជ្រើស និងរៀបលំដាប់រោគវិនិច្ឆ័យ</h2>
+<ul>
+<li><b>រោគវិនិច្ឆ័យចម្បង (អ្នកជំងឺសម្រាកពេទ្យ)៖</b> ជំងឺដែលបញ្ជាក់ក្រោយពិនិត្យ ថាជាមូលហេតុចម្បងនៃការសម្រាកពេទ្យ។</li>
+<li><b>រោគវិនិច្ឆ័យចម្បង (OPD/ER)៖</b> មូលហេតុចម្បងនៃការមកពិនិត្យ។</li>
+<li><b>រោគវិនិច្ឆ័យផ្សេងទៀត៖</b> ផលវិបាក និងជំងឺរួមដែលបានព្យាបាល បានពិនិត្យ ឬធ្វើឲ្យសម្រាកពេទ្យយូរ។ កុំដាក់កូដបញ្ហាចាស់ដែលលែងសំខាន់។</li>
+<li><b>រោគវិនិច្ឆ័យមិនទាន់ច្បាស់៖</b> សម្រាប់អ្នកជំងឺសម្រាកពេទ្យ រោគវិនិច្ឆ័យដែលសរសេរពេលចេញថា «ប្រហែល» ឬ «សង្ស័យ» ត្រូវដាក់កូដដូចជាបានបញ្ជាក់។ សម្រាប់ OPD ត្រូវដាក់កូដរោគសញ្ញា ឬសញ្ញាជំនួសវិញ។ បើវិធាន HIS ខុសពីនេះ សូមអនុវត្តតាម HIS។</li>
+<li><b>ជំងឺពីរស្មើគ្នា៖</b> ដាក់មុន ជំងឺដែលប្រើធនធានច្រើនជាង ឬជាមូលហេតុនៃការសម្រាកពេទ្យ។</li>
+</ul>
+<div class="box ok"><b>ឧទាហរណ៍៖</b> សម្រាកពេទ្យដោយរលាកសួត កើតខ្សោយផ្លូវដង្ហើមស្រួចស្រាវ និងមាន COPD ពីមុន៖ <a class="c" href="index.html#J18.9">J18.9</a> → <a class="c" href="index.html#J96.01">J96.01</a> → <a class="c" href="index.html#J44.9">J44.9</a>។</div>
+</section>
+
+<section id="s6"><h2>៦. ការមានផ្ទៃពោះ ការសម្រាល និងក្រោយសម្រាល (O, Z3x)</h2>
+<ul>
+<li><b>ពិនិត្យផ្ទៃពោះធម្មតា៖</b> <a class="c" href="index.html#Z34.0">Z34.0x</a> (ផ្ទៃពោះដំបូង) ឬ <a class="c" href="index.html#Z34.8">Z34.8x</a> (ផ្ទៃពោះបន្ទាប់) ជាមួយលេខត្រីមាស ឧ. <a class="c" href="index.html#Z34.83">Z34.83</a>។ KCPH កត់លេខរៀងនៃការពិនិត្យដោយ <a class="c" href="index.html#Z36.4.0">Z36.4.0</a>–<a class="c" href="index.html#Z36.4.3">Z36.4.3</a> (ANC ១–៤) ផងដែរ។</li>
+<li><b>តាមដានផ្ទៃពោះប្រឈមហានិភ័យខ្ពស់៖</b> <a class="c" href="index.html#O09">O09.x</a>។</li>
+<li><b>ផលវិបាក៖</b> ប្រើកូដ O ជាមួយត្រីមាស ឧ. <a class="c" href="index.html#O14.13">O14.13</a> បំរុងក្រឡាភ្លើងធ្ងន់ ត្រីមាសទី៣ ឬ <a class="c" href="index.html#O99.013">O99.013</a> ស្លេកស្លាំងក្នុងពេលមានផ្ទៃពោះ ត្រីមាសទី៣ (បន្ថែម <a class="c" href="index.html#D50.9">D50.9</a> ដើម្បីបញ្ជាក់ប្រភេទស្លេកស្លាំង)។</li>
+<li><b>ត្រីមាស</b> រាប់ពីថ្ងៃដំបូងនៃរដូវចុងក្រោយ៖ ត្រីមាសទី១ តិចជាង ១៤ សប្តាហ៍ ទី២ ពី ១៤ ដល់ក្រោម ២៨ សប្តាហ៍ ទី៣ ពី ២៨ សប្តាហ៍ឡើង។</li>
+<li><b>ការសម្រាល៖</b> ដាក់កូដការសម្រាល (ឧ. <a class="c" href="index.html#O80">O80</a> <a class="c" href="index.html#O82">O82</a>) និងផលវិបាក ព្រមទាំង <b>លទ្ធផលនៃការសម្រាល</b> លើកំណត់ត្រាម្តាយ ឧ. <a class="c" href="index.html#Z37.0">Z37.0</a> កើតរស់មួយ។</li>
+<li><b>ក្រោយសម្រាល៖</b> ផលវិបាកប្រើកូដ O «puerperium» ឧ. <a class="c" href="index.html#O72.1">O72.1</a> ហូរឈាមភ្លាមៗក្រោយសម្រាល។ ការពិនិត្យក្រោយសម្រាលនៅ KCPH៖ <a class="c" href="index.html#Z39.0.0">Z39.0.0</a>–<a class="c" href="index.html#Z39.0.4">Z39.0.4</a>។</li>
+</ul>
+</section>
+
+<section id="s7"><h2>៧. ទារកទើបកើត (P, Z38)</h2>
+<ul>
+<li>កំណត់ត្រាកំណើតរបស់ទារក ចាប់ផ្តើមដោយ <a class="c" href="index.html#Z38.0">Z38.0x</a> ឧ. <a class="c" href="index.html#Z38.00">Z38.00</a> ទារកកើតរស់មួយ កើតក្នុងមន្ទីរពេទ្យ សម្រាលតាមទ្វារមាស។</li>
+<li>បន្ទាប់មក បន្ថែមស្ថានភាពទារកពីជំពូក P ឧ. <a class="c" href="index.html#P59.9">P59.9</a> ខាន់លឿងទារកទើបកើត <a class="c" href="index.html#P07.15">P07.15</a> ទម្ងន់ទាប ១២៥០–១៤៩៩ ក្រាម <a class="c" href="index.html#P22.0">P22.0</a> ពិបាកដកដង្ហើម (RDS)។</li>
+<li>កុំប្រើកូដ P លើកំណត់ត្រាម្តាយ ឬកូដ O លើកំណត់ត្រាទារក។</li>
+</ul>
+</section>
+
+<section id="s8"><h2>៨. របួស និងមូលហេតុខាងក្រៅ (S, T, V–Y)</h2>
+<ol>
+<li><b>កូដរបួស</b> ជាមួយខាង និងតួអក្សរទី៧៖ <a class="c" href="index.html#S52.502A">S52.502A</a>។</li>
+<li><b>មូលហេតុខាងក្រៅ</b> ពោលគឺរបៀបដែលកើតឡើង៖ <a class="c" href="index.html#V29.9XXA">V29.9XXA</a> អ្នកជិះម៉ូតូ គ្រោះថ្នាក់ចរាចរណ៍ ឬ <a class="c" href="index.html#W19.XXXA">W19.XXXA</a> ធ្លាក់។</li>
+<li><b>ទីកន្លែង</b> (ស្រេចចិត្ត)៖ <a class="c" href="index.html#Y92.410">Y92.410</a> ផ្លូវ ឬផ្លូវជាតិ។</li>
+</ol>
+<div class="box warn">ប្រើ <b>A</b> ពេលអ្នកជំងឺកំពុងទទួលការព្យាបាលសកម្ម (ER វះកាត់ សម្រាកពេទ្យ)។ ប្រើ <b>D</b> សម្រាប់ការមកពិនិត្យពេលកំពុងជាសះស្បើយ ដូចជាប្តូររុំរបួស ឬពិនិត្យម្នាងសិលា។ ប្រើ <b>S</b> សម្រាប់ផលវិបាកយូរអង្វែងនៃរបួសចាស់។</div>
+</section>
+
+<section id="s9"><h2>៩. ការពុល និងការធ្វើបាបខ្លួនឯង (T36–T65)</h2>
+<ul>
+<li>ជ្រើសកូដតាម <b>សារធាតុ</b>។ តួអក្សរទី៦ បង្ហាញ <b>ចេតនា</b>៖ 1 = ចៃដន្យ 2 = ធ្វើបាបខ្លួនឯងដោយចេតនា 3 = ការវាយប្រហារ 4 = មិនច្បាស់។ តួអក្សរទី៧ បង្ហាញប្រភេទនៃការមក។</li>
+<li>ដាក់កូដផលប៉ះពាល់ផងដែរ ឧ. សន្លប់ ឬខ្សោយផ្លូវដង្ហើម។</li>
+<li><b>ការធ្វើបាបខ្លួនឯងនៅ KCPH៖</b> បន្ថែម <a class="c" href="index.html#T14.91">T14.91</a> ការប៉ុនប៉ងធ្វើអត្តឃាត និងកូដមូលហេតុ <a class="c" href="index.html#X60">X60</a> ហើយបញ្ជូនអ្នកជំងឺទៅពិនិត្យសុខភាពផ្លូវចិត្ត។ ពេលមកពិនិត្យលើកក្រោយ កត់ប្រវត្តិដោយ <a class="c" href="index.html#Z91.5">Z91.5</a>។</li>
+<li>ពស់ចឹក៖ <a class="c" href="index.html#T63.0">T63.0x</a>។ ប្រតិកម្មអាឡែស៊ីធ្ងន់ (anaphylaxis)៖ <a class="c" href="index.html#T78.2">T78.2</a>។</li>
+</ul>
+</section>
+
+<section id="s10"><h2>១០. ជំងឺឆ្លង និង sepsis</h2>
+<ul>
+<li><b>Sepsis៖</b> ដាក់កូដ sepsis មុន (<a class="c" href="index.html#A41.9">A41.9</a> ឬតាមមេរោគ ឧ. <a class="c" href="index.html#A41.51">A41.51</a> E. coli) បន្ទាប់មកប្រភព (ឧ. <a class="c" href="index.html#N39.0">N39.0</a>) រួច <a class="c" href="index.html#R65.20">R65.20</a> sepsis ធ្ងន់ ឬ <a class="c" href="index.html#R65.21">R65.21</a> ស្ហុកដោយ sepsis។</li>
+<li><b>HIV៖</b> បញ្ជីកូដ KCPH មានតែ <a class="c" href="index.html#B20">B20</a> ដូច្នេះត្រូវបន្ថែមជំងឺឱកាសនិយម (ឧ. <a class="c" href="index.html#A15.0">A15.0</a> របេងសួត)។ HIV វិជ្ជមាន គ្មានរោគសញ្ញា៖ <a class="c" href="index.html#Z21">Z21</a>។</li>
+<li><b>គ្រុនឈាម (អត្ថន័យក្នុងស្រុក KCPH)៖</b> <a class="c" href="index.html#A90">A90</a> គ្រុនឈាម <a class="c" href="index.html#A91">A91</a> គ្មានស្ហុក <a class="c" href="index.html#A91.1">A91.1</a> មានស្ហុក <a class="c" href="index.html#A91.2">A91.2</a> សង្ស័យ <a class="c" href="index.html#A91.3">A91.3</a> ប្រហាក់ប្រហែល។</li>
+<li><b>គ្រុនចាញ់៖</b> ប្រើកូដតាមប្រភេទមេរោគក្រោយតេស្ត (<a class="c" href="index.html#B50.9">B50.9</a> falciparum <a class="c" href="index.html#B51.9">B51.9</a> vivax)។</li>
+<li><b>ជំងឺត្រូវរាយការណ៍</b> (របេង អាសន្នរោគ គ្រុនឈាម គ្រុនចាញ់ ឆ្កែឆ្កួត តេតាណូស កញ្ជ្រឹល និងផ្សេងៗ) ត្រូវរាយការណ៍ទៅអ្នកទទួលបន្ទុកការឃ្លាំមើលផងដែរ។</li>
+</ul>
+</section>
+
+<section id="s11"><h2>១១. ជំងឺរ៉ាំរ៉ៃ (ជំងឺមិនឆ្លង)</h2>
+<ul>
+<li><b>លើសសម្ពាធឈាម៖</b> ក្នុងបញ្ជី KCPH <a class="c" href="index.html#I10">I10</a> មានកូដក្នុងស្រុក <a class="c" href="index.html#I10.0">I10.0</a> និង <a class="c" href="index.html#I10.9">I10.9</a>។ សូមប្រើកូដដែល HIS តម្រូវ។ មានជំងឺបេះដូងប្រើ <a class="c" href="index.html#I11.0">I11.x</a> មានជំងឺតម្រងនោមរ៉ាំរ៉ៃប្រើ <a class="c" href="index.html#I12.9">I12.x</a> មានទាំងពីរប្រើ <a class="c" href="index.html#I13">I13.x</a>។</li>
+<li><b>ទឹកនោមផ្អែមប្រភេទ២៖</b> <a class="c" href="index.html#E11.9">E11.9</a> គ្មានផលវិបាក។ មានផលវិបាក ប្រើកូដរួម ឧ. <a class="c" href="index.html#E11.22">E11.22</a> មាន CKD ដោយទឹកនោមផ្អែម បូកដំណាក់កាល <a class="c" href="index.html#N18.30">N18.3x</a> ឬ <a class="c" href="index.html#E11.65">E11.65</a> មានជាតិស្ករខ្ពស់។ ទឹកនោមផ្អែមពេលមានផ្ទៃពោះ ជាកូដ O (<a class="c" href="index.html#O24.410">O24.41x</a>)។</li>
+<li><b>ដាច់សរសៃឈាមខួរក្បាល៖</b> <a class="c" href="index.html#I64">I64</a> ប្រើតែមុនធ្វើ CT បន្ទាប់មកប្រើ <a class="c" href="index.html#I63.9">I63.9</a> (ស្ទះ) ឬ <a class="c" href="index.html#I61.9">I61.9</a> (ហូរឈាម)។ ពេលមកតាមដាន ដាក់កូដផលវិបាកដោយ <a class="c" href="index.html#I69.3">I69.3x</a> មិនមែនដាច់សរសៃឈាមស្រួចស្រាវថ្មីទេ។</li>
+<li><b>COPD និងហឺត៖</b> បញ្ជាក់ពេលកាន់តែធ្ងន់ (<a class="c" href="index.html#J44.1">J44.1</a> <a class="c" href="index.html#J45.901">J45.901</a>) ឬ status asthmaticus (<a class="c" href="index.html#J45.902">J45.902</a>)។</li>
+</ul>
+</section>
+
+<section id="s12"><h2>១២. សុខភាពផ្លូវចិត្ត មហារីក រោគសញ្ញា និងកូដ Z</h2>
+<h3>សុខភាពផ្លូវចិត្ត</h3>
+<ul>
+<li>ធ្លាក់ទឹកចិត្ត៖ ត្រូវប្រាប់កម្រិតធ្ងន់ធ្ងរជានិច្ច (<a class="c" href="index.html#F32.1">F32.1</a> មធ្យម)។ ជៀសវាង <a class="c" href="index.html#F32.9">F32.9</a> ពេលដឹងកម្រិតរួច។</li>
+<li>គ្រឿងស្រវឹង និងគ្រឿងញៀន៖ ប្រាប់សារធាតុ និងលំនាំនៃការប្រើ (ប្រើប្រកបដោយគ្រោះថ្នាក់ ការពឹងផ្អែក <a class="c" href="index.html#F10.20">F10.20</a> ការដកខ្លួនមាន delirium <a class="c" href="index.html#F10.231">F10.231</a>)។</li>
+<li>ត្រូវសួរពីគំនិតអត្តឃាតជានិច្ច ហើយកត់ <a class="c" href="index.html#R45.851">R45.851</a> បើមាន។</li>
+</ul>
+<h3>មហារីក (ដុំសាច់)</h3>
+<ul><li>កូដ C = សាហាវ D00–D09 = in situ D10–D36 = ស្លូត D37–D49 = មិនច្បាស់។ ត្រូវប្រាប់ទីតាំង ឧ. <a class="c" href="index.html#C53.9">C53.9</a> មាត់ស្បូន ឬ <a class="c" href="index.html#D25.9">D25.9</a> ដុំសាច់ស្លូតក្នុងស្បូន (fibroid)។</li></ul>
+<h3>រោគសញ្ញា (R) និងកត្តា (Z)</h3>
+<ul><li>ប្រើកូដ R តែពេលមិនទាន់មានរោគវិនិច្ឆ័យ។ ប្រើកូដ Z សម្រាប់ការមកដែលមិនមែនដោយសារជំងឺ ឧ. ចាក់ថ្នាំបង្ការ (<a class="c" href="index.html#Z23">Z23</a>) ពន្យារកំណើត (<a class="c" href="index.html#Z30.0">Z30.0x</a>) ពិនិត្យសុខភាពទូទៅ (<a class="c" href="index.html#Z00.00">Z00.00</a>) ឬតាមដានក្រោយព្យាបាល (<a class="c" href="index.html#Z09">Z09</a>)។</li></ul>
+</section>
+
+<section id="s13"><h2>១៣. ឧទាហរណ៍អនុវត្ត</h2>
+<div class="tw"><table>
+<tr><th>#</th><th>អ្នកជំងឺ</th><th>កូដ (តាមលំដាប់)</th><th>មូលហេតុ</th></tr>
+<tr><td>១</td><td>សម្រាកពេទ្យដោយរលាកសួត SpO₂ 84% ខ្សោយផ្លូវដង្ហើមស្រួចស្រាវ</td><td><a class="c" href="index.html#J18.9">J18.9</a> <a class="c" href="index.html#J96.01">J96.01</a></td><td>មូលហេតុចម្បងមុន បន្ទាប់មកផលវិបាក</td></tr>
+<tr><td>២</td><td>រលាកផ្លូវនោម វប្បកម្មឈាមឃើញ E. coli មានស្ហុក</td><td><a class="c" href="index.html#A41.51">A41.51</a> <a class="c" href="index.html#N39.0">N39.0</a> <a class="c" href="index.html#R65.21">R65.21</a></td><td>Sepsis មុន បន្ទាប់មកប្រភព រួចស្ហុក</td></tr>
+<tr><td>៣</td><td>ស្ត្រីមានផ្ទៃពោះ ៣៣ សប្តាហ៍ បំរុងក្រឡាភ្លើងធ្ងន់</td><td><a class="c" href="index.html#O14.13">O14.13</a></td><td>កូដ O ជាមួយលេខត្រីមាសទី៣</td></tr>
+<tr><td>៤</td><td>ពិនិត្យផ្ទៃពោះធម្មតា ផ្ទៃពោះលើកទី២ ៣០ សប្តាហ៍ ពិនិត្យលើកទី៣</td><td><a class="c" href="index.html#Z34.83">Z34.83</a> <a class="c" href="index.html#Z36.4.2">Z36.4.2</a></td><td>ផ្ទៃពោះធម្មតា បូកលេខរៀងការពិនិត្យ KCPH</td></tr>
+<tr><td>៥</td><td>សម្រាលធម្មតាតាមទ្វារមាស កូនរស់មួយ</td><td><a class="c" href="index.html#O80">O80</a> <a class="c" href="index.html#Z37.0">Z37.0</a></td><td>ការសម្រាល បូកលទ្ធផលលើកំណត់ត្រាម្តាយ</td></tr>
+<tr><td>៦</td><td>ទារកកើតនៅទីនេះតាមទ្វារមាស ខាន់លឿងថ្ងៃទី២</td><td><a class="c" href="index.html#Z38.00">Z38.00</a> <a class="c" href="index.html#P59.9">P59.9</a></td><td>កំណត់ត្រាកំណើតមុន បន្ទាប់មកស្ថានភាពទារក</td></tr>
+<tr><td>៧</td><td>គ្រោះថ្នាក់ម៉ូតូលើផ្លូវ បាក់បិទចុងក្រោមឆ្អឹង radius ខាងឆ្វេង មក ER</td><td><a class="c" href="index.html#S52.502A">S52.502A</a> <a class="c" href="index.html#V29.9XXA">V29.9XXA</a> <a class="c" href="index.html#Y92.410">Y92.410</a></td><td>របួសជាមួយខាង និង A បន្ទាប់មកមូលហេតុ និងទីកន្លែង</td></tr>
+<tr><td>៨</td><td>ផឹកថ្នាំ organophosphate ក្រោយឈ្លោះក្នុងគ្រួសារ</td><td><a class="c" href="index.html#T60.0X2A">T60.0X2A</a> <a class="c" href="index.html#T14.91">T14.91</a> <a class="c" href="index.html#X60">X60</a></td><td>សារធាតុជាមួយចេតនា 2 បន្ទាប់មកការប៉ុនប៉ងអត្តឃាត និងមូលហេតុ</td></tr>
+<tr><td>៩</td><td>ទឹកនោមផ្អែមប្រភេទ២ មានជំងឺតម្រងនោមដំណាក់កាល៣ និងលើសសម្ពាធឈាម</td><td><a class="c" href="index.html#E11.22">E11.22</a> <a class="c" href="index.html#I12.9">I12.9</a> <a class="c" href="index.html#N18.30">N18.30</a></td><td>កូដរួម បូកដំណាក់កាល CKD</td></tr>
+<tr><td>១០</td><td>OPD គ្រុន តេស្តរហ័សវិជ្ជមាន P. falciparum គ្មានសញ្ញាគ្រោះថ្នាក់</td><td><a class="c" href="index.html#B50.9">B50.9</a></td><td>រោគវិនិច្ឆ័យបញ្ជាក់ មិនមែន <a class="c" href="index.html#R50.9">R50.9</a></td></tr>
+</table></div>
+</section>
+
+<section id="s14"><h2>១៤. កំហុសញឹកញាប់ និងរបៀបកែ</h2>
+<div class="tw"><table>
+<tr><th>កំហុស</th><th>ខុស</th><th>ត្រូវ</th></tr>
+<tr><td>កត់កូដក្បាលក្រុម</td><td><a class="c" href="index.html#J18">J18</a>, <a class="c" href="index.html#O14.1">O14.1</a>, <a class="c" href="index.html#S52.5">S52.5</a></td><td><a class="c" href="index.html#J18.9">J18.9</a>, <a class="c" href="index.html#O14.13">O14.13</a>, <a class="c" href="index.html#S52.502A">S52.502A</a></td></tr>
+<tr><td>«មិនបញ្ជាក់» ពេលដឹងលទ្ធផល</td><td><a class="c" href="index.html#B54">B54</a></td><td><a class="c" href="index.html#B50.9">B50.9</a></td></tr>
+<tr><td>រោគសញ្ញាជំនួសរោគវិនិច្ឆ័យ</td><td><a class="c" href="index.html#R50.9">R50.9</a></td><td>រោគវិនិច្ឆ័យដែលបានបញ្ជាក់</td></tr>
+<tr><td>ស្ត្រីមានផ្ទៃពោះ គ្មានកូដ O</td><td><a class="c" href="index.html#D50.9">D50.9</a> តែឯង</td><td><a class="c" href="index.html#O99.013">O99.013</a> + <a class="c" href="index.html#D50.9">D50.9</a></td></tr>
+<tr><td>ត្រីមាសមិនបញ្ជាក់</td><td><a class="c" href="index.html#O14.10">O14.10</a></td><td><a class="c" href="index.html#O14.13">O14.13</a></td></tr>
+<tr><td>របួសគ្មានមូលហេតុ</td><td><a class="c" href="index.html#S52.502A">S52.502A</a> តែឯង</td><td>+ <a class="c" href="index.html#V29.9XXA">V29.9XXA</a></td></tr>
+<tr><td>ការពុលគ្មានចេតនា និងកូដធ្វើបាបខ្លួនឯង</td><td>តែសារធាតុ</td><td><a class="c" href="index.html#T60.0X2A">T60.0X2A</a> + <a class="c" href="index.html#T14.91">T14.91</a> + <a class="c" href="index.html#X60">X60</a></td></tr>
+<tr><td>Sepsis កត់តែប្រភព</td><td><a class="c" href="index.html#J18.9">J18.9</a> តែឯង</td><td><a class="c" href="index.html#A41.9">A41.9</a> + <a class="c" href="index.html#J18.9">J18.9</a> + <a class="c" href="index.html#R65.20">R65.2x</a></td></tr>
+<tr><td>មិនប្តូរប្រភេទដាច់សរសៃឈាមក្រោយ CT</td><td><a class="c" href="index.html#I64">I64</a></td><td><a class="c" href="index.html#I63.9">I63.9</a> / <a class="c" href="index.html#I61.9">I61.9</a></td></tr>
+<tr><td>កូដដាច់ដោយឡែក ពេលមានកូដរួម</td><td><a class="c" href="index.html#I10">I10</a> + <a class="c" href="index.html#N18.30">N18.30</a></td><td><a class="c" href="index.html#I12.9">I12.9</a> + <a class="c" href="index.html#N18.30">N18.30</a></td></tr>
+<tr><td>គ្មានកម្រិតធ្ងន់ធ្ងរ</td><td><a class="c" href="index.html#F32.9">F32.9</a></td><td><a class="c" href="index.html#F32.1">F32.1</a> (មធ្យម)</td></tr>
+</table></div>
+<div class="box info">ប្រើ <b>ពិនិត្យកូដ</b> ក្នុងឧបករណ៍៖ បិទភ្ជាប់កូដពី EMR ហើយវានឹងបង្ហាញកូដក្បាលក្រុម កូដដែលគ្មានក្នុងបញ្ជី និងកូដស្ទួន។</div>
+</section>
+
+<section id="s15"><h2>១៥. អ្វីដែលគ្រូពេទ្យត្រូវសរសេរ</h2>
+<p>អ្នកដាក់កូដ អាចដាក់កូដបានតែអ្វីដែលបានសរសេរ។ សូមកត់ត្រា៖</p>
+<ul>
+<li><b>ប្រភេទ និងមូលហេតុ៖</b> មេរោគ (E. coli, P. falciparum) សារធាតុ របៀបនៃរបួស</li>
+<li><b>ទីតាំង និងខាង៖</b> ឆ្វេង ឬស្តាំ ខាងលើ ឬខាងក្រោម ឆ្អឹង ឬសរីរាង្គឲ្យច្បាស់</li>
+<li><b>កម្រិតធ្ងន់ធ្ងរ និងដំណាក់កាល៖</b> ស្រាល មធ្យម ឬធ្ងន់ ដំណាក់កាល CKD មាន ឬគ្មានស្ហុក មានរោគសញ្ញាវិកលចរិក</li>
+<li><b>ស្រួចស្រាវ ឬរ៉ាំរ៉ៃ</b> វគ្គដំបូង ឬកើតឡើងវិញ កាន់តែធ្ងន់</li>
+<li><b>ផ្ទៃពោះ៖</b> អាយុគភ៌គិតជាសប្តាហ៍ ចំនួនផ្ទៃពោះ និងចំនួនកូន លេខរៀងការពិនិត្យផ្ទៃពោះ</li>
+<li><b>ទំនាក់ទំនងរវាងជំងឺ៖</b> «ដោយសារ» «បន្ទាប់ពី» «មានផលវិបាក»</li>
+<li><b>រោគវិនិច្ឆ័យចុងក្រោយពេលចេញ</b> ជំនួសរោគវិនិច្ឆ័យបណ្តោះអាសន្ន និងរោគសញ្ញា</li>
+</ul>
+</section>
+
+<section id="s16"><h2>១៦. ពណ៌ហានិភ័យ KCPH</h2>
+<p>សម្រាប់សេវា ៥ (មាតា និងទារក ជំងឺមិនឆ្លង វេជ្ជសាស្ត្រផ្ទៃក្នុង វះកាត់ សុខភាពផ្លូវចិត្ត) កូដនីមួយៗមានពណ៌ហានិភ័យ KCPH៖</p>
+<div class="tw"><table>
+<tr><th>ពណ៌</th><th>អត្ថន័យ</th><th>សកម្មភាព</th></tr>
+<tr><td><span class="rb r3">ក្រហម · ខ្ពស់</span></td><td>គ្រោះថ្នាក់ដល់ជីវិត ឬមានសញ្ញាគ្រោះថ្នាក់</td><td>ធ្វើភ្លាម ហៅគ្រូពេទ្យជាន់ខ្ពស់ អនុវត្តពិធីសារអាសន្ន ពិចារណា ICU ឬបញ្ជូន</td></tr>
+<tr><td><span class="rb r2">លឿង · មធ្យម</span></td><td>ត្រូវការការវាយតម្លៃពីគ្រូពេទ្យ</td><td>ផែនការជាលាយលក្ខណ៍អក្សរក្នុងថ្ងៃដដែល ច្រើនតែសម្រាកពេទ្យ ឬតាមដានជិតស្និទ្ធ</td></tr>
+<tr><td><span class="rb r1">បៃតង · ទាប</span></td><td>ស្ថានភាពធម្មតា ឬស្រាល</td><td>ការថែទាំធម្មតា និងតាមដានតាមកាលវិភាគ</td></tr>
+</table></div>
+<div class="box warn">ពណ៌ទាំងនេះជាជំនួយក្នុងការចាត់ថ្នាក់ ដែលរៀបចំដោយ KCPH។ វាមិនជំនួសការវិនិច្ឆ័យគ្លីនិក ពិន្ទុចាត់ថ្នាក់ ឬពិធីសារថ្នាក់ជាតិទេ។</div>
+</section>
+
+<section id="s17"><h2>១៧. បញ្ជីត្រួតពិនិត្យ មុនចុះហត្ថលេខា ឬបញ្ចូលកំណត់ត្រា</h2>
+<ul class="chk">
+<li>រោគវិនិច្ឆ័យចម្បងនៅមុនគេ</li>
+<li>កូដទាំងអស់ <b>✓ ប្រើបាន</b> (មិនមែនកូដក្បាលក្រុម)</li>
+<li>បានបំពេញខាង ត្រីមាស ដំណាក់កាល កម្រិតធ្ងន់ធ្ងរ និងតួអក្សរទី៧</li>
+<li>កូដរោគសញ្ញាត្រូវបានប្តូរជារោគវិនិច្ឆ័យបញ្ជាក់</li>
+<li>ស្ត្រីមានផ្ទៃពោះ ឬក្រោយសម្រាល មានកូដ O ទារកទើបកើតមានកូដ Z38/P</li>
+<li>របួស និងការពុល មានមូលហេតុខាងក្រៅ (និងចេតនា)</li>
+<li>Sepsis មានប្រភព និងកម្រិតធ្ងន់ធ្ងរ</li>
+<li>គ្មានកូដស្ទួន កូដក្នុងស្រុក KCPH ប្រើតាមតម្រូវការ HIS</li>
+<li>ជំងឺត្រូវរាយការណ៍ ត្រូវបានរាយការណ៍</li>
+</ul>
+</section>
+
+<section id="s18"><h2>១៨. ការប្រើឧបករណ៍ស្វែងរកកូដ ICD-10 របស់ KCPH</h2>
+<ol>
+<li><b>ស្វែងរក</b> តាមកូដ (<code>J18</code>, <code>J189</code>) ពាក្យអង់គ្លេស ពាក្យខ្មែរ (<code>រលាកសួត</code>, <code>ទឹកនោមផ្អែម</code>) ឬអក្សរកាត់ (HTN, COPD, PPH)។ ឧបករណ៍កែអក្ខរាវិរុទ្ធខុសដោយស្វ័យប្រវត្តិ ហើយលើ Chrome ឬ Android អាចចុចប៊ូតុង 🎤 ដើម្បីស្វែងរកដោយសំឡេង។</li>
+<li><b>កំណត់ផ្នែករបស់អ្នក</b> (ឧ. មាតា និងទារក) ដើម្បីឲ្យកូដផ្នែករបស់អ្នកបង្ហាញមុនគេ។</li>
+<li>លើលទ្ធផលនីមួយៗ ចុច <b>⧉</b> ដើម្បីចម្លងកូដទៅ EMR ឬ <b>＋</b> ដើម្បីបន្ថែមក្នុងបញ្ជីអ្នកជំងឺ។</li>
+<li>ចុចលើកូដ ដើម្បីមើលថាប្រើបានឬទេ ពណ៌ហានិភ័យ KCPH កំណត់សម្គាល់ និងកូដលម្អិតជាង។</li>
+<li><b>បញ្ជីខ្ញុំ</b>៖ ដាក់រោគវិនិច្ឆ័យចម្បងមុន រួចចម្លង បោះពុម្ព ឬទាញយក Excel។</li>
+<li><b>ពិនិត្យកូដ</b>៖ បិទភ្ជាប់កូដពី EMR ឬរបាយការណ៍ ដើម្បីរកកូដក្បាលក្រុម កូដដែលគ្មានក្នុងបញ្ជី និងកូដស្ទួន។</li>
+<li>ឧបករណ៍ដំណើរការដោយគ្មានអ៊ីនធឺណិត បន្ទាប់ពីបើកលើកដំបូង ហើយអាចដំឡើងលើទូរស័ព្ទបាន (ជំនួយ › ដំឡើង)។</li>
+</ol>
+<div class="btns"><a class="btn p" href="index.html">បើកឧបករណ៍ស្វែងរកកូដ</a><a class="btn" href="index.html#check">ពិនិត្យកូដ</a></div>
+</section>
+
+<section id="s19"><h2>១៩. ឧបករណ៍ឆ្លាតវៃ និង AI ឥតគិតថ្លៃ (កំណែ ១.៧)</h2>
+<ol>
+<li><b>សរសេរដូចគ្រូពេទ្យ។</b> ការស្វែងរកយល់អក្សរកាត់ និងបរិបទ៖ <code>k/c HTN</code>, <code>T2DM + CKD 3</code>, <code>G2P1 34 wks anaemia</code>, <code>lt # femur</code>, <code>h/o TB</code> ពាក្យទូទៅ (<code>heart attack</code>, <code>loose motion</code>) និងភាសាខ្មែរ (<code>មានផ្ទៃពោះ ៧ ខែ ក្រឡាភ្លើង</code>)។ ចំនួនសប្តាហ៍ផ្ទៃពោះជ្រើសត្រីមាសដោយស្វ័យប្រវត្តិ; «PE» មានន័យថា បំរុងក្រឡាភ្លើង ពេលមានផ្ទៃពោះ និងស្ទះសរសៃឈាមសួត ក្នុងករណីផ្សេង។</li>
+<li><b>រោគវិនិច្ឆ័យច្រើនក្នុងពេលតែមួយ។</b> ញែកដោយសញ្ញាក្បៀស៖ ឧបករណ៍បង្ហាញកូដល្អបំផុត ៣ សម្រាប់នីមួយៗ គន្លឹះសរសេរកូដ (កូដរួម មូលហេតុខាងក្រៅ លំដាប់សេបស៊ីស…) និងប៊ូតុង <b>＋ បន្ថែមកូដល្អបំផុតទាំងអស់</b>។</li>
+<li><b>AI ឥតគិតថ្លៃ។</b> ពេលមានអ៊ីនធឺណិត ហើយវាយជាប្រយោគ AI (Google Gemini) ស្នើកូដ ព្រមទាំងហេតុផលខ្លី។ បង្ហាញតែកូដដែលមានក្នុងបញ្ជី KCPH ប៉ុណ្ណោះ។ អាចបិទបានក្នុង ជំនួយ › ការកំណត់។</li>
+<li><b>📷 រូបថត/អត្ថបទ → កូដ។</b> ថតរូបរោគវិនិច្ឆ័យ (សរសេរដៃក៏បាន) ឬបិទភ្ជាប់សេចក្តីសង្ខេបចេញពីពេទ្យ។ AI រាយរោគវិនិច្ឆ័យទាំងអស់តាមលំដាប់ (ចម្បង បន្ទាប់បន្សំ មូលហេតុខាងក្រៅ)។ ធីកកូដដែលត្រូវយក ហើយបន្ថែមក្នុងបញ្ជីខ្ញុំ។</li>
+<li><b>🧠 ពិនិត្យ និងវាយតម្លៃកូដ។</b> ការវាយតម្លៃផ្តល់ពិន្ទុ (០–១០០) និងពន្យល់បញ្ហា៖ លំដាប់ខុស ខ្វះកូដរួម (E11.22, I11.0, I12.9, I13.0) ខ្វះមូលហេតុខាងក្រៅ ឬ Z37 កូដម្តាយ និងទារកលាយគ្នា កូដរោគសញ្ញាមិនចាំបាច់។ <b>AI ពិនិត្យបន្ថែម</b> ផ្តល់មតិទីពីរ។</li>
+<li><b>💾 បញ្ជីជំងឺ។</b> ក្នុង «បញ្ជីខ្ញុំ» បញ្ចូលថ្ងៃ ភេទ អាយុ និង OPD/IPD រួចចុច <b>រក្សាទុក ហើយចាប់ផ្តើមអ្នកជំងឺបន្ទាប់</b>។ រក្សាទុកតែ ថ្ងៃ ភេទ ក្រុមអាយុ កូដ និងផ្នែក — មិនដែលរក្សាឈ្មោះ ឬលេខអ្នកជំងឺទេ។</li>
+<li><b>📈 ស្ថិតិជំងឺ។</b> ជំងឺ ១០ ដំបូងប្រចាំខែ ក្រុមអាយុ × ភេទ ជំពូក ICD-10 និងផ្នែក សម្រាប់ឧបករណ៍នេះ ឬមូលដ្ឋានទាំងមូល ជាមួយ Excel និង PDF — សម្រាប់របាយការណ៍ HIS និងប្រជុំគុណភាព។</li>
+<li><b>🎓 ហ្វឹកហាត់ និងតេស្ត។</b> ករណីពិត ៣២ (មាតា និងទារក ជំងឺមិនឆ្លង វះកាត់ សុខភាពផ្លូវចិត្ត កុមារ) មានពិន្ទុ និងការពន្យល់។ លទ្ធផលបង្ហាញក្នុងរបាយការណ៍ប្រចាំខែ សម្រាប់តាមដានវគ្គបណ្តុះបណ្តាល។</li>
+</ol>
+<p class="warn"><b>ឯកជនភាព៖</b> សេវា AI ឥតគិតថ្លៃ អាចត្រូវបាន Google ប្រើដើម្បីកែលម្អផលិតផល។ កុំវាយ ឬថតឈ្មោះ លេខសម្គាល់ ទូរស័ព្ទ ឬអាសយដ្ឋានអ្នកជំងឺ — សូមបិទ ឬកាត់ចេញមុន។ ពិនិត្យកូដរបស់ AI ជាមួយឯកសារជានិច្ច៖ ការសម្រេចចុងក្រោយជារបស់គ្រូពេទ្យ។</p>
+<div class="btns"><a class="btn p" href="index.html#doc">រូបថត/អត្ថបទ → កូដ</a><a class="btn" href="index.html#check">ពិនិត្យ និងវាយតម្លៃ</a><a class="btn" href="index.html#quiz">ហ្វឹកហាត់ និងតេស្ត</a><a class="btn" href="index.html#stats">ស្ថិតិជំងឺ</a></div>
+</section>
+
+
+<footer>
+រៀបចំដោយ <b>Dr. Yeap Kong</b><br>ប្រធានការិយាល័យបច្ចេកទេស មន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង (KCPH)<br>
+កូដ៖ បញ្ជីកូដមេ KCPH ICD10-Diagnosis_Updated_9 · កំណែ ១.៧ · ខែវិច្ឆិកា ឆ្នាំ២០២៦<br>
+សូមផ្ញើការកែតម្រូវតាមរយៈឧបករណ៍ (ជំនួយ › រាយការណ៍បញ្ហា)។
+</footer>
+</div>
+<button class="top" onclick="scrollTo({top:0,behavior:'smooth'})" aria-label="ត្រឡប់ទៅលើ">↑</button>
+</body>
+</html>
